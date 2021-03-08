@@ -1,0 +1,71 @@
+CREATE TABLE students(
+    studentId CHAR(5) NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    password CHAR(32) NOT NULL,
+    eMail VARCHAR(256),
+
+    PRIMARY KEY (studentId)
+);
+
+CREATE TABLE classes(
+    classId CHAR(7) NOT NULL,
+    className VARCHAR(30) NOT NULL,
+
+    PRIMARY KEY (classId)
+)
+
+CREATE TABLE comments(
+    classId CHAR(7) NOT NULL,
+    commentId INT UNSIGNED NOT NULL,
+    studentId CHAR(5) NOT NULL,
+    #返信かどうかのフラグ
+    reply INT DEFAULT 0,
+    #どのコメントに対する返信なのかを、特定する
+    replyClassId CHAR(7) DEFAULT NULL,
+    replyCommentId int UNSIGNED DEFAULT NULL,
+    comment TEXT NOT NULL,
+    good INT DEFAULT 0,
+    bad INT DEFAULT 0,
+    time DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (classId, commentId),
+    FOREIGN KEY (classId) REFERENCES classes(classId),
+    FOREIGN KEY (studentId) REFERENCES students(studentId),
+)
+
+CREATE TABLE pastQuestions(
+    classId CHAR(7) NOT NULL,
+    year INT UNSIGNED NOT NULL,
+    #1：1クオーター、2：2クオーター、3：3クオーター、4：4クオーター
+    semester INT UNSIGNED NOT NULL,
+    fileName VARCHAR(30) NOT NULL,
+
+    PRIMARY KEY (classId, year, semester),
+    FOREIGN KEY (classId) REFERENCES classes(classId),
+)
+
+CREATE TABLE questionBoards(
+    classId CHAR(7) NOT NULL,
+    year INT UNSIGNED NOT NULL,
+    questionBoardId INT NOT NULL,
+    studentId CHAR(5) NOT NULL,
+    question TEXT NOT NULL,
+    time DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (classId, year, questionBoardId),
+    FOREIGN KEY (classId) REFERENCES classes(classId),
+)
+
+CREATE TABLE questionBoardReplies(
+    classId CHAR(7) NOT NULL,
+    year INT UNSIGNED NOT NULL,
+    questionBoardId INT NOT NULL,
+    questionBoardReplieId INT UNSIGNED NOT NULL,
+    studentId CHAR(5) NOT NULL,
+    reply text NOT NULL,
+    time DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (classId, year, questionBoardId, questionBoardId),
+    FOREIGN KEY (classId) REFERENCES classesa(classId),
+    FOREIGN KEY (studentId) REFERENCES students(studentId),
+)
