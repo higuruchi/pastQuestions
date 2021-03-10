@@ -17,13 +17,8 @@ CREATE TABLE classes(
 CREATE TABLE comments(
     classId CHAR(7) NOT NULL,
     commentId INT UNSIGNED NOT NULL,
-    studentId CHAR(5) NOT NULL,
-    #返信かどうかのフラグ
-    reply INT DEFAULT 0,
-    #どのコメントに対する返信なのかを、特定する
-    replyClassId CHAR(7) DEFAULT NULL,
-    replyCommentId int UNSIGNED DEFAULT NULL,
     comment TEXT NOT NULL,
+    studentId CHAR(5) NOT NULL,
     good INT DEFAULT 0,
     bad INT DEFAULT 0,
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -33,15 +28,31 @@ CREATE TABLE comments(
     FOREIGN KEY (studentId) REFERENCES students(studentId),
 )
 
+CREATE TABLE commentReplies (
+    classId CHAR(7) NOT NULL,
+    commentId INT UNSIGNED NOT NULL,
+    commentReplieId INT UNSIGNED NOT NULL,
+    comment TEXT NOT NULL,
+    studentId CHAR(5) NOT NULL,
+    good INT DEFAULT 0,
+    bad INT DEFAULT 0,
+    time datetime default CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (classId, commentId, commentReplieId),
+    FOREIGN KEY (classId, commentId) REFERENCES classes(classId, commentId),
+    FOREIGN KEY (studentId) REFERENCES students(studentId)
+)
+
 CREATE TABLE pastQuestions(
     classId CHAR(7) NOT NULL,
     year INT UNSIGNED NOT NULL,
     #1：1クオーター、2：2クオーター、3：3クオーター、4：4クオーター
     semester INT UNSIGNED NOT NULL,
-    fileName VARCHAR(30) NOT NULL,
+    fileName VARCHAR(30),
 
     PRIMARY KEY (classId, year, semester),
     FOREIGN KEY (classId) REFERENCES classes(classId),
+    CHECK (semester BETWEEN 1 AND 4)
 )
 
 CREATE TABLE questionBoards(
