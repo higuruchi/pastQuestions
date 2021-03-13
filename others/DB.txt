@@ -25,23 +25,24 @@ CREATE TABLE comments(
 
     PRIMARY KEY (classId, commentId),
     FOREIGN KEY (classId) REFERENCES classes(classId),
-    FOREIGN KEY (studentId) REFERENCES students(studentId),
-)
+    FOREIGN KEY (studentId) REFERENCES students(studentId)
+);
 
 CREATE TABLE commentReplies (
     classId CHAR(7) NOT NULL,
     commentId INT UNSIGNED NOT NULL,
-    commentReplieId INT UNSIGNED NOT NULL,
+    commentReplyId INT UNSIGNED NOT NULL,
     comment TEXT NOT NULL,
     studentId CHAR(5) NOT NULL,
     good INT DEFAULT 0,
     bad INT DEFAULT 0,
     time datetime default CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (classId, commentId, commentReplieId),
-    FOREIGN KEY (classId, commentId) REFERENCES classes(classId, commentId),
+    PRIMARY KEY (classId, commentId, commentReplyId),
+    FOREIGN KEY (classId) REFERENCES classes(classId),
+    FOREIGN KEY (classId, commentId) REFERENCES comments(classId, commentId),
     FOREIGN KEY (studentId) REFERENCES students(studentId)
-)
+);
 
 CREATE TABLE pastQuestions(
     classId CHAR(7) NOT NULL,
@@ -53,7 +54,7 @@ CREATE TABLE pastQuestions(
     PRIMARY KEY (classId, year, semester),
     FOREIGN KEY (classId) REFERENCES classes(classId),
     CHECK (semester BETWEEN 1 AND 4)
-)
+);
 
 CREATE TABLE questionBoards(
     classId CHAR(7) NOT NULL,
@@ -64,19 +65,19 @@ CREATE TABLE questionBoards(
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (classId, year, questionBoardId),
-    FOREIGN KEY (classId) REFERENCES classes(classId),
-)
+    FOREIGN KEY (classId) REFERENCES classes(classId)
+);
 
 CREATE TABLE questionBoardReplies(
     classId CHAR(7) NOT NULL,
     year INT UNSIGNED NOT NULL,
     questionBoardId INT NOT NULL,
-    questionBoardReplieId INT UNSIGNED NOT NULL,
+    questionBoardReplyId INT UNSIGNED NOT NULL,
     studentId CHAR(5) NOT NULL,
     reply text NOT NULL,
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    PRIMARY KEY (classId, year, questionBoardId, questionBoardId),
-    FOREIGN KEY (classId) REFERENCES classesa(classId),
-    FOREIGN KEY (studentId) REFERENCES students(studentId),
-)
+    PRIMARY KEY (classId, year, questionBoardId, questionBoardReplyId),
+    FOREIGN KEY (classId) REFERENCES classes(classId),
+    FOREIGN KEY (studentId) REFERENCES students(studentId)
+);
