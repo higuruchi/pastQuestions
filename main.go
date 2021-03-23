@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"fmt"
 	"pastQuestions/api/loginLogout"
+	"pastQuestions/api/students"
 	"github.com/gorilla/sessions"
 )
 
@@ -16,13 +17,14 @@ func main() {
 	
 	files := http.FileServer(http.Dir("./public"))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
+	mux.HandleFunc("/students", students.Students)
 	mux.HandleFunc("/login", login)
 	
 	server := &http.Server{
 		Addr: "192.168.33.10:8080",
 		Handler: mux,
 	}
-	fmt.Println("wow")
+	fmt.Println("8080番ポートにてサーバが稼働しています")
 	server.ListenAndServe()
 }
 
@@ -30,8 +32,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 	studentId := r.PostFormValue("studentId")
 	password := r.PostFormValue("password")
 	student, _ := loginLogout.Login(studentId, password)
-
-	fmt.Printf("%v", studentId)
 
 	if student.StudentId != ""{
 		session, _ := store.Get(r, sessionName)

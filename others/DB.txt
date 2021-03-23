@@ -1,5 +1,5 @@
 CREATE TABLE students(
-    studentId CHAR(5) NOT NULL,
+    studentId CHAR(6) NOT NULL,
     name VARCHAR(20) NOT NULL,
     password CHAR(32) NOT NULL,
     eMail VARCHAR(256),
@@ -12,7 +12,7 @@ CREATE TABLE classes(
     className VARCHAR(30) NOT NULL,
 
     PRIMARY KEY (classId)
-)
+);
 
 CREATE TABLE comments(
     classId CHAR(7) NOT NULL,
