@@ -6,20 +6,18 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
 	"fmt"
+	"strings"
 	// "golang.org/x/crypto/bcrypt"
 )
 
 type Student struct {
-	StudentId string
-	Name string
-	Email string
-	Password string
+	StudentId string `json:"studentId"`
+	Name string `json:"name"`
 }
 
 type Result struct {
 	Result bool `json:"result"`
-	StudentId string `json:"studentId"`
-	Name string `json:"name"`
+	Body []Student `json:"body"`
 }
 
 var Db *sql.DB
@@ -37,25 +35,44 @@ func Students(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 		case "POST":
 			student := new(Student)
+			result := new(Result)
 			student.StudentId = r.PostFormValue("studentId")
 			student.Name = r.PostFormValue("name")
-			student.Password = r.PostFormValue("password")
-			if student.AddStudent() {
-				fmt.Println("hello wold bad !!!")
-				result := new(Result)
+			password := r.PostFormValue("password")
+			if student.AddStudent(password) {
 				result.Result = true
-				result.StudentId = student.StudentId
-				result.Name = student.Name
+				result.Body = append(result.Body, *student)
+				json, _ := json.Marshal(result)
+				w.Header().Set("Content-Type", "application/json; charset=utf8")
+				w.Write(json)
+			} else {
+				result.Result = false
 				json, _ := json.Marshal(result)
 				w.Header().Set("Content-Type", "application/json; charset=utf8")
 				w.Write(json)
 			}
-		// case "DELETE":
-
+		case "DELETE":
+			student := new(Student)
+			result := new(Result)
+			parsedUri := strings.Split(r.RequestURI, "/")
+			student.StudentId = parsedUri[2]
+			fmt.Printf("%v\n", student.StudentId)
+			if student.DeleteStudent() {
+				result.Result = true
+				result.Body = append(result.Body, *student)
+				json, _ := json.Marshal(result)
+				w.Header().Set("Content-Type", "application/json; charset=utf8")
+				w.Write(json)
+			} else {
+				result.Result = false
+				json, _ := json.Marshal(result)
+				w.Header().Set("Content-Type", "application/json; charset=utf8")
+				w.Write(json)
+			}
 	}
 }
 
-func (student *Student)AddStudent() (result bool) {
+func (student *Student)AddStudent(password string) (result bool) {
 	num := 0
 	result = false
 	statement := `SELECT COUNT(*) FROM students WHERE studentId=?`
@@ -73,9 +90,8 @@ func (student *Student)AddStudent() (result bool) {
 		if err != nil {
 			return
 		}
-		_, err = stmt.Exec(student.StudentId, student.Name, student.Password)
+		_, err = stmt.Exec(student.StudentId, student.Name, password)
 		if err !=nil {
-			fmt.Printf("%v", err)
 			return
 		}
 		result = true
@@ -83,9 +99,33 @@ func (student *Student)AddStudent() (result bool) {
 	return
 }
 
-// func (student *Student)DeleteStudent() (result bool) {
+func (student *Student)DeleteStudent() (result bool) {
+	result = false
+	num := 0
 
-// }
+	statement := `SELECT studentId, name, COUNT(*) OVER() FROM students WHERE studentId=?`
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(student.StudentId).Scan(&student.StudentId, &student.Name, &num)
+	fmt.Printf("%v\n", num)
+	if num != 0 {
+		statement = `DELETE FROM students WHERE studentId=?`
+		stmt, err = Db.Prepare(statement)
+		if err != nil {
+			return
+		}
+		_, err = stmt.Exec(student.StudentId)
+		if err != nil {
+			return
+		}
+		result = true
+	}
+	return
+}
 
 // func (student *Student)ModifyStudent() (result bool) {
 
