@@ -69,6 +69,39 @@ func Students(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json; charset=utf8")
 				w.Write(json)
 			}
+		case "PUT":
+			student := new(Student)
+			result := new(Result)
+			parseUri := strings.Split(r.RequestURI, "/")
+			student.StudentId = parseUri[2]
+			password := r.FormValue("password")
+			key := parseUri[3]
+			val := r.FormValue(key)
+			if student.ModifyStudent(key, val, password) {
+				result.Result = true
+				result.Body = append(result.Body, *student)
+				json, _ := json.Marshal(result)
+				w.Header().Set("Content-Type", "application/json; charset=utf8")
+				w.Write(json)
+			} else {
+				result.Result = false
+				json, _ := json.Marshal(result)
+				w.Header().Set("Content-Type", "application/json; charset=utf8")
+				w.Write(json)
+			}
+
+			// if key == "email" {
+			// 	password := r.FormValue("password")
+			// 	newEmail := r.FormValue("email")
+			// } else if key == "name" {
+			// 	password := r.FormValue("password")
+			// 	newName = r.FormValue("name")
+			// } else if key == "password" {
+			// 	password := r.FormValue("password")
+			// 	newPassword := r.FormValue("newPassword")
+			// }
+			
+
 	}
 }
 
@@ -111,7 +144,9 @@ func (student *Student)DeleteStudent() (result bool) {
 	}
 	defer stmt.Close()
 	err = stmt.QueryRow(student.StudentId).Scan(&student.StudentId, &student.Name, &num)
-	fmt.Printf("%v\n", num)
+	if err != nil {
+		return
+	}
 	if num != 0 {
 		statement = `DELETE FROM students WHERE studentId=?`
 		stmt, err = Db.Prepare(statement)
@@ -127,9 +162,44 @@ func (student *Student)DeleteStudent() (result bool) {
 	return
 }
 
-// func (student *Student)ModifyStudent() (result bool) {
+func (student *Student)ModifyStudent(key string, val string, password string) (result bool) {
+	result = false
+	num := 0
 
-// }
+	statement := `SELECT COUNT(*) OVER() FROM students WHERE studentId=? AND password=?`
+	stmt, err := Db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(student.StudentId, password).Scan(&num)
+	if err != nil {
+		return
+	}
+	if num != 0 {
+		switch key{
+			case "eMail":
+				statement = `UPDATE students SET eMail=? WHERE studentId=?`
+			case "name":
+				statement = `UPDATE students SET name=? WHERE studentId=?`
+			case "password":
+				statement = `UPDATE students SET password=? WHERE studentId=?`
+		}
+		stmt, err = Db.Prepare(statement)
+		if err != nil {
+			fmt.Printf("%v\n", err)
+
+			return
+		}
+		_, err = stmt.Exec(val, student.StudentId)
+		if err != nil {
+			return
+		}
+		result = true
+	}
+	return
+
+}
 
 // func(student *Student)ShowStudnet() {
 
