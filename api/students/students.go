@@ -45,18 +45,19 @@ func checkInput(val string, check string) (ret string, err bool) {
 
 func Students(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf8")
+	
 	switch r.Method {
 		case "POST":
 			student := new(Student)
 			result := new(Result)
 			var (
-				flg bool
+				flg bool = false
 				password string
 			)
 
 			student.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
-			student.Name, flg = checkInput(r.PostFormValue("name"), `[a-zA-Z]{1, 20}`)
-			password, flg = checkInput(r.PostFormValue("password"), `[a-zA-Z0-9]{1, 32}`)
+			student.Name, flg = checkInput(r.PostFormValue("name"), ``)
+			password, flg = checkInput(r.PostFormValue("password"), ``)
 
 			if flg {
 				result.Result = false
@@ -65,7 +66,6 @@ func Students(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			
-
 			if student.AddStudent(password) {
 				result.Result = true
 				result.Body = append(result.Body, *student)
@@ -74,6 +74,7 @@ func Students(w http.ResponseWriter, r *http.Request) {
 			} else {
 				result.Result = false
 				json, _ := json.Marshal(result)
+				// w.Header().Set("Content-Type", "application/json; charset=utf8")
 				w.Write(json)
 			}
 		case "DELETE":
@@ -108,8 +109,24 @@ func Students(w http.ResponseWriter, r *http.Request) {
 			} else {
 				result.Result = false
 				json, _ := json.Marshal(result)
+				// w.Header().Set("Content-Type", "application/json; charset=utf8")
 				w.Write(json)
 			}
+		case "GET":
+			condition := make(map[string]string)
+			result := new(Result)
+			query := r.URL.Query()
+			
+			for key, val := range query {
+				condition[key] = val[0]
+			}
+
+			// 失敗した場合のエラー処理のことなどは後回しにする
+			result.ShowStudnet(condition)
+			result.Result = true
+			json, _ := json.Marshal(result)
+			w.Write(json)
+
 	}
 }
 
@@ -209,6 +226,42 @@ func (student *Student)ModifyStudent(key string, val string, password string) (r
 
 }
 
-// func(student *Student)ShowStudnet() {
+func (result *Result)ShowStudnet(condition map[string]string) {
 
-// }
+	statement := `SELECT studentId, name FROM students `
+	fmt.Printf("%v\n", condition)
+	if len(condition) > 0 {
+		keyStack := make([]string, 0)
+		valStack := make([]string, 0)
+
+		statement = statement + "WHERE "
+		for key, val := range condition {
+			keyStack = append(keyStack, key)
+			valStack = append(valStack, val)
+		}
+
+		fmt.Printf("%v\n%v\n", keyStack, valStack)
+
+		// SQLインジェクションの脆弱性がある
+		// ブレースホルダでSQLを実行したいのだが、方法がいまいちわからない。要件等
+	
+		statement += keyStack[0] + " = \"" + valStack[0] + "\" "
+		for i := 1; i < len(keyStack); i++ {
+			statement += "AND " + keyStack[i] + "= \"" + valStack[i] + "\" "
+		}
+
+	}
+	fmt.Printf("%v\n", statement)
+	rows, err := db.Query(statement)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		student := new(Student)
+		_ = rows.Scan(&student.StudentId, &student.Name)
+		result.Body = append(result.Body, *student)
+	}
+}
