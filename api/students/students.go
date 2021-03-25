@@ -230,9 +230,9 @@ func (result *Result)ShowStudnet(condition map[string]string) {
 
 	statement := `SELECT studentId, name FROM students `
 	fmt.Printf("%v\n", condition)
+	keyStack := make([]string, 0)
+	valStack := make([]string, 0)
 	if len(condition) > 0 {
-		keyStack := make([]string, 0)
-		valStack := make([]string, 0)
 
 		statement = statement + "WHERE "
 		for key, val := range condition {
@@ -245,23 +245,41 @@ func (result *Result)ShowStudnet(condition map[string]string) {
 		// SQLインジェクションの脆弱性がある
 		// ブレースホルダでSQLを実行したいのだが、方法がいまいちわからない。要件等
 	
-		statement += keyStack[0] + " = \"" + valStack[0] + "\" "
+		statement += keyStack[0] + "=? "
 		for i := 1; i < len(keyStack); i++ {
-			statement += "AND " + keyStack[i] + "= \"" + valStack[i] + "\" "
+			// statement += "AND " + keyStack[i] + "= \"" + valStack[i] + "\" "
+			statement += "AND " + keyStack[i] + "=?"
 		}
 
 	}
-	fmt.Printf("%v\n", statement)
-	rows, err := db.Query(statement)
-	if err != nil {
-		fmt.Printf("%v\n", err)
-		return
-	}
-	defer rows.Close()
 
-	for rows.Next() {
-		student := new(Student)
-		_ = rows.Scan(&student.StudentId, &student.Name)
-		result.Body = append(result.Body, *student)
+	// ここ以降最悪
+
+	if len(valStack) == 1 {
+		rows, err := db.Query(statement, valStack[0])
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			return
+		}
+		defer rows.Close()
+	
+		for rows.Next() {
+			student := new(Student)
+			_ = rows.Scan(&student.StudentId, &student.Name)
+			result.Body = append(result.Body, *student)
+		}
+	} else if len(valStack) == 2 {
+		rows, err := db.Query(statement, valStack[0], valStack[1])
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			return
+		}
+		defer rows.Close()
+	
+		for rows.Next() {
+			student := new(Student)
+			_ = rows.Scan(&student.StudentId, &student.Name)
+			result.Body = append(result.Body, *student)
+		}
 	}
 }
