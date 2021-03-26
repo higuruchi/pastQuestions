@@ -82,7 +82,7 @@ func Students(w http.ResponseWriter, r *http.Request) {
 			result := new(Result)
 			parsedUri := strings.Split(r.RequestURI, "/")
 			student.StudentId = parsedUri[2]
-			fmt.Printf("%v\n", student.StudentId)
+
 			if student.DeleteStudent() {
 				result.Result = true
 				result.Body = append(result.Body, *student)
@@ -113,16 +113,23 @@ func Students(w http.ResponseWriter, r *http.Request) {
 				w.Write(json)
 			}
 		case "GET":
-			condition := make(map[string]string)
+			// condition := make(map[string]string)
 			result := new(Result)
-			query := r.URL.Query()
-			
-			for key, val := range query {
-				condition[key] = val[0]
+			// query := r.URL.Query()
+			studentId, flg := checkInput(r.FormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
+			fmt.Printf("%v\n", flg)
+			if flg {
+				result.Result = false
+				json, _ := json.Marshal(result)
+				w.Write(json)
 			}
+			
+			// for key, val := range query {
+			// 	condition[key] = val[0]
+			// }
 
 			// 失敗した場合のエラー処理のことなどは後回しにする
-			result.ShowStudnet(condition)
+			result.ShowStudnet(studentId)
 			result.Result = true
 			json, _ := json.Marshal(result)
 			w.Write(json)
@@ -226,60 +233,18 @@ func (student *Student)ModifyStudent(key string, val string, password string) (r
 
 }
 
-func (result *Result)ShowStudnet(condition map[string]string) {
+func (result *Result)ShowStudnet(studentId string) {
+	student := new(Student)
 
-	statement := `SELECT studentId, name FROM students `
-	fmt.Printf("%v\n", condition)
-	keyStack := make([]string, 0)
-	valStack := make([]string, 0)
-	if len(condition) > 0 {
-
-		statement = statement + "WHERE "
-		for key, val := range condition {
-			keyStack = append(keyStack, key)
-			valStack = append(valStack, val)
-		}
-
-		fmt.Printf("%v\n%v\n", keyStack, valStack)
-
-		// SQLインジェクションの脆弱性がある
-		// ブレースホルダでSQLを実行したいのだが、方法がいまいちわからない。要件等
-	
-		statement += keyStack[0] + "=? "
-		for i := 1; i < len(keyStack); i++ {
-			// statement += "AND " + keyStack[i] + "= \"" + valStack[i] + "\" "
-			statement += "AND " + keyStack[i] + "=?"
-		}
-
+	statement := `SELECT studentId, name FROM students WHERE studentId=?`
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		return
 	}
+	defer stmt.Close()
 
-	// ここ以降最悪
+	err = stmt.QueryRow(studentId).Scan(&student.StudentId, &student.Name)
 
-	if len(valStack) == 1 {
-		rows, err := db.Query(statement, valStack[0])
-		if err != nil {
-			fmt.Printf("%v\n", err)
-			return
-		}
-		defer rows.Close()
-	
-		for rows.Next() {
-			student := new(Student)
-			_ = rows.Scan(&student.StudentId, &student.Name)
-			result.Body = append(result.Body, *student)
-		}
-	} else if len(valStack) == 2 {
-		rows, err := db.Query(statement, valStack[0], valStack[1])
-		if err != nil {
-			fmt.Printf("%v\n", err)
-			return
-		}
-		defer rows.Close()
-	
-		for rows.Next() {
-			student := new(Student)
-			_ = rows.Scan(&student.StudentId, &student.Name)
-			result.Body = append(result.Body, *student)
-		}
-	}
+	result.Body = append(result.Body, *student)
 }
