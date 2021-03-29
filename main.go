@@ -20,6 +20,7 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/students/", students.Students)
 	mux.HandleFunc("/classes/", classes.Classes)
+	mux.HandleFunc("/comments/", commetns.Comments)
 	mux.HandleFunc("/login", login)
 	
 	server := &http.Server{

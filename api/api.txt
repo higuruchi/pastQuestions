@@ -1,0 +1,10 @@
+api:students
+POST /students/
+DELETE /students/<studentId>
+PUT /students/<studentId>/<key(coloum)>
+    <form>
+    <password name="password">
+    <val name=key>
+    </form>
+GET /studetns/?studentId=<studentId>
+

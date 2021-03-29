@@ -18,7 +18,7 @@ CREATE TABLE comments(
     classId CHAR(7) NOT NULL,
     commentId INT UNSIGNED NOT NULL,
     comment TEXT NOT NULL,
-    studentId CHAR(5) NOT NULL,
+    studentId CHAR(6) NOT NULL,
     good INT DEFAULT 0,
     bad INT DEFAULT 0,
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -33,7 +33,7 @@ CREATE TABLE commentReplies (
     commentId INT UNSIGNED NOT NULL,
     commentReplyId INT UNSIGNED NOT NULL,
     comment TEXT NOT NULL,
-    studentId CHAR(5) NOT NULL,
+    studentId CHAR(6) NOT NULL,
     good INT DEFAULT 0,
     bad INT DEFAULT 0,
     time datetime default CURRENT_TIMESTAMP,
@@ -60,7 +60,7 @@ CREATE TABLE questionBoards(
     classId CHAR(7) NOT NULL,
     year INT UNSIGNED NOT NULL,
     questionBoardId INT NOT NULL,
-    studentId CHAR(5) NOT NULL,
+    studentId CHAR(6) NOT NULL,
     question TEXT NOT NULL,
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -81,3 +81,13 @@ CREATE TABLE questionBoardReplies(
     FOREIGN KEY (classId) REFERENCES classes(classId),
     FOREIGN KEY (studentId) REFERENCES students(studentId)
 );
+
+INSERT INTO students (studentId, name, password) VALUES ("19T325", "fumiya", "password");
+INSERT INTO students (studentId, name, password) VALUES ("19T326", "yamada", "password");
+INSERT INTO students (studentId, name, password) VALUES ("19T327", "john", "password");
+
+INSERT INTO classes (classId, className) VALUES ("5005040", "情報数学");
+INSERT INTO classes (classId, className) VALUES ("5005070", "データ構造とアルゴリズム");
+
+INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070", 1, "hello", "19T325");
+INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070", 2, "hello WORLD", "19T326");
