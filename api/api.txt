@@ -21,3 +21,10 @@ PUT /classes/<classId>
 
 DELETE /CLASSES/<classId>
 
+api:comments
+POST /comments/
+    <form>
+    <studentId name="studentId">
+    <classId name="classId">
+    <comment name="comment">
+    </form>

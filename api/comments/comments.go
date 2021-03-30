@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
-	// "fmt"
+	"fmt"
 	// "strings"
 	"regexp"
+	"strconv"
 )
 
 type Comment struct {
@@ -17,6 +18,8 @@ type Comment struct {
 	StudentId string
 	GoodFlg bool
 	BadFlg bool
+	Good int
+	Bad int
 }
 type Result struct {
 	Result bool `json:"result"`
@@ -49,13 +52,16 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 		case "POST":
 			flg := false
+			var tmp string
 			comment := new(Comment)
 			result := new(Result)
 
+			comment.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
 			comment.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{7}`)
-			comment.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
+			tmp, _ = checkInput(r.PostFormValue("comment"), `.+`)
+			comment.CommentId, _ = strconv.Atoi(tmp)
 
-			if flg == false {
+			if flg {
 				result.Result = false	
 			} else {
 				if comment.AddComment() {
@@ -68,7 +74,31 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 			
 			json, _ := json.Marshal(result)
 			w.Write(json)
-		// case "GET":
+		case "GET":
+			flg := false
+			var tmp string
+			comment := new(Comment)
+			result := new(Result)
+
+			comment.ClassId, flg = checkInput(r.FormValue("classId"), `[0-9]{0,7}`)
+			tmp, _ = checkInput(r.FormValue("commentId"), ``)
+			comment.CommentId, _ = strconv.Atoi(tmp)
+
+			if flg {
+				result.Result = false
+			} else {
+				if ret, flg := comment.GetComment(); flg {
+					fmt.Printf("%v\n", flg)
+					result.Result = true
+					result.Body = ret
+				} else {
+					result.Result = false
+				}
+			}
+
+			json, _ := json.Marshal(result)
+			w.Write(json)
+
 
 		// case "PUT":
 		// case "DELETE":
@@ -107,20 +137,44 @@ func (comment *Comment)AddComment()(result bool) {
 		num++
 	}
 
-	statement = `INSERT INTO comments (classId, commentId, comment) VALUES (?, ?, ?)`
+	statement = `INSERT INTO comments (classId, commentId, comment, studentId) VALUES (?, ?, ?, ?)`
 	stmt, err = db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
 		result = false
 		return
 	}
-	_, err = stmt.Exec(comment.ClassId, num, comment.Comment)
+	_, err = stmt.Exec(comment.ClassId, num, comment.Comment, comment.StudentId)
 	if err != nil {
 		result = false
 		return
 	}
 
 	comment.CommentId = num
+	result = true
+	return
+}
+
+func (comment *Comment)GetComment()(comments []Comment, result bool) {
+	statement := `SELECT classId, commentId, comment, studentId, good, bad FROM comments WHERE classId=? AND commentId>=?`
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		fmt.Println("1")
+		result = false
+		return
+	}
+
+	rows, _ := stmt.Query(comment.ClassId, comment.CommentId)
+	for rows.Next() {
+		resultComment := new(Comment)
+		if err := rows.Scan(&resultComment.ClassId, &resultComment.CommentId, &resultComment.Comment, &resultComment.StudentId, &resultComment.Good, &resultComment.Bad); err != nil {
+			fmt.Println("2")
+			result = false
+			return
+		}
+		comments = append(comments, *resultComment)
+	}
 	result = true
 	return
 }

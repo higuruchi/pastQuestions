@@ -50,7 +50,8 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			flg := false
 			class := new(Class)
 			result := new(Result)
-			class.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{7}`)
+
+			class.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{0,7}`)
 			class.ClassName, flg = checkInput(r.PostFormValue("className"), `.+`)
 			if flg {
 				result.Result = false
@@ -69,7 +70,7 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			parsedUri := strings.Split(r.RequestURI, "/")
 			class := new(Class)
 			result := new(Result)
-			class.ClassId, flg = checkInput(parsedUri[2], `[0-9]{7}`)
+			class.ClassId, flg = checkInput(parsedUri[2], `[0-9]{0,7}`)
 			class.ClassName, flg = checkInput(r.FormValue("className"), `.+`)
 
 			if flg {
@@ -89,7 +90,7 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			parseUri := strings.Split(r.RequestURI, "/")
 			class := new(Class)
 			result := new(Result)
-			class.ClassId, flg = checkInput(parseUri[2], `[0-9]{7}`)
+			class.ClassId, flg = checkInput(parseUri[2], `[0-9]{0,7}`)
 
 			if flg {
 				result.Result = false	
@@ -211,3 +212,7 @@ func (class *Class)DeleteClass()(result bool){
 	result = false
 	return
 }
+
+// func (class *Class)GetClass()(classes []Class) {
+
+// }
