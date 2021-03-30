@@ -91,3 +91,6 @@ INSERT INTO classes (classId, className) VALUES ("5005070", "データ構造と�
 
 INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070", 1, "hello", "19T325");
 INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070", 2, "hello WORLD", "19T326");
+
+
+SELECT CASE WHEN commentId IS NULL THEN 0 ELSE commentId END commentId FROM comments WHERE classId="5005070" ORDER BY commentId DESC LIMIT 1

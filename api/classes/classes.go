@@ -5,14 +5,16 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
-	// "fmt"
-	// "strings"
+	"regexp"
+	"fmt"
+	"strings"
 )
 
 type Class struct {
 	ClassId string `json:"classId"`
 	ClassName string `json:"className"`
 }
+
 type Result struct {
 	Result bool `json:"result"`
 	Body []Class `json:"body"`
@@ -64,16 +66,16 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			w.Write(json)
 		case "PUT":
 			flg := false
-			parseUri := strings.Split(r.RequestURI, "/")
+			parsedUri := strings.Split(r.RequestURI, "/")
 			class := new(Class)
-			result := new(result)
+			result := new(Result)
 			class.ClassId, flg = checkInput(parsedUri[2], `[0-9]{7}`)
-			class.Name, flg = checkInput(r.PostFormValue["className"], `.+`)
+			class.ClassName, flg = checkInput(r.FormValue("className"), `.+`)
 
 			if flg {
 				result.Result = false
 			} else {
-				if class.ModifyStudent() {
+				if class.ModifyClass() {
 					result.Result = true
 					result.Body = append(result.Body, *class)
 				} else {
@@ -86,7 +88,7 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			flg := false
 			parseUri := strings.Split(r.RequestURI, "/")
 			class := new(Class)
-			result := new(result)
+			result := new(Result)
 			class.ClassId, flg = checkInput(parseUri[2], `[0-9]{7}`)
 
 			if flg {
@@ -161,7 +163,7 @@ func (class *Class)ModifyClass()(result bool) {
 			return
 		}
 
-		err = stmt.Exec(class.ClassName, class.ClassId)
+		_, err = stmt.Exec(class.ClassName, class.ClassId)
 		if err != nil {
 			result = false
 			return
@@ -198,7 +200,7 @@ func (class *Class)DeleteClass()(result bool){
 			result = false
 			return
 		}
-		err = stmt.Exec()
+		_, err = stmt.Exec(class.ClassId)
 		if err != nil {
 			result = false
 			return

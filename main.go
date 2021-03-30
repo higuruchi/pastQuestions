@@ -6,6 +6,7 @@ import (
 	"pastQuestions/api/loginLogout"
 	"pastQuestions/api/students"
 	"pastQuestions/api/classes"
+	"pastQuestions/api/comments"
 	"github.com/gorilla/sessions"
 )
 
@@ -20,7 +21,7 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/students/", students.Students)
 	mux.HandleFunc("/classes/", classes.Classes)
-	mux.HandleFunc("/comments/", commetns.Comments)
+	mux.HandleFunc("/comments/", comments.Comments)
 	mux.HandleFunc("/login", login)
 	
 	server := &http.Server{

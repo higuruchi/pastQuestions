@@ -8,3 +8,16 @@ PUT /students/<studentId>/<key(coloum)>
     </form>
 GET /studetns/?studentId=<studentId>
 
+api:classes
+POST /classes/
+    <form>
+    <classId name="classId">
+    <className name="className">
+    </form>
+PUT /classes/<classId>
+    <form>
+    <className name="className">
+    </form>
+
+DELETE /CLASSES/<classId>
+
