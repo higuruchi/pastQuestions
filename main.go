@@ -27,7 +27,7 @@ func main() {
 	mux.HandleFunc("/students/", students.Students)
 	mux.HandleFunc("/classes/", classes.Classes)
 	mux.HandleFunc("/comments/", comments.Comments)
-	mux.HandleFunc("/commentsReply/", commentReplies.CommentReplies)
+	mux.HandleFunc("/commentReplies/", commentReplies.CommentReplies)
 	mux.HandleFunc("/login", login)
 	
 	server := &http.Server{

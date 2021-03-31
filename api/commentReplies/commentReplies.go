@@ -1,4 +1,4 @@
-package comments
+package commentReplies
 
 import (
 	"net/http"
