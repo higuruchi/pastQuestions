@@ -6,8 +6,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
 	// "fmt"
-	// "strings"
 	"regexp"
+	"strings"
 	"strconv"
 )
 
@@ -58,6 +58,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 
 			comment.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
 			comment.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{7}`)
+			comment.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
 			// tmp, _ = checkInput(r.PostFormValue("comment"), `.+`)
 			// comment.CommentId, _ = strconv.Atoi(tmp)
 
@@ -98,8 +99,36 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 			json, _ := json.Marshal(result)
 			w.Write(json)
 
+		case "PUT":
+			result := new(Result)
+			comment := new(Comment)
+			parsedUri := strings.Split(r.RequestURI, "/")
+			changeCommand := parsedUri[3]
+			comment.ClassId = parsedUri[5]
+			comment.CommentId, _ = strconv.Atoi(parsedUri[6])
 
-		// case "PUT":
+			
+			switch changeCommand {
+				case "good":
+					addOrReduce, _ := strconv.ParseBool(parsedUri[4]) 
+					if addOrReduce {
+						result.Result = comment.GoodAndBad(true, true)
+					} else {
+						result.Result = comment.GoodAndBad(true, false)
+					}
+					json, _ := json.Marshal(result)
+					w.Write(json)
+				case "bad":
+					addOrReduce, _ := strconv.ParseBool(parsedUri[3]) 
+					if addOrReduce {
+						result.Result = comment.GoodAndBad(false, true)
+					} else {
+						result.Result = comment.GoodAndBad(false, false)
+					}
+					json, _ := json.Marshal(result)
+					w.Write(json)
+
+			}
 		// case "DELETE":
 	}
 }
@@ -174,4 +203,126 @@ func (comment *Comment)GetComment()(comments []Comment, result bool) {
 	}
 	result = true
 	return
+}
+
+// goodOrBad : true->good, false->bad  addOrReduce : true->add, false->reduce 
+func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool) {
+	num := 0
+
+	statement := `SELECT COUNT(*) FROM comments WHERE classId=? AND commentId=?`
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		return
+	}
+
+	err = stmt.QueryRow(comment.ClassId, comment.CommentId).Scan(&num)
+	if err != nil {
+		return
+	}
+	if num == 0 {
+		return
+	}
+	// goodの場合
+	if goodOrBad {
+		var good int
+		statement = `SELECT good FROM comments WHERE classId=? AND commentId=?`
+		stmt, err = db.Prepare(statement)
+		defer stmt.Close()
+		if err!= nil {
+			return
+		}
+
+		err = stmt.QueryRow(comment.ClassId, comment.CommentId).Scan(&good)
+		if err != nil {
+			return
+		}
+		// addの場合
+		if addOrReduce {
+			good++
+			statement = `UPDATE comments SET good=? WHERE classId=? AND commentId=?`
+			stmt, err = db.Prepare(statement)
+			defer stmt.Close()
+			if err!= nil {
+				return
+			}
+			_, err = stmt.Exec(good, comment.ClassId, comment.CommentId)
+			if err != nil {
+				return
+			}
+			result = true
+			return
+
+		// reduceの場合
+		} else {
+			good--
+			if good < 0 {
+				return
+			}
+			statement = `UPDATE comments SET good=? WHERE classId=? AND commentId=?`
+			stmt, err = db.Prepare(statement)
+			defer stmt.Close()
+			if err!= nil {
+				return
+			}
+			_, err = stmt.Exec(good, comment.ClassId, comment.CommentId)
+			if err != nil {
+				return
+			}
+			result = true
+			return
+		}
+
+	// badの場合
+	} else {
+		var bad int
+		statement = `SELECT bad FROM comments WHERE classId=? AND commentId=?`
+		stmt, err = db.Prepare(statement)
+		defer stmt.Close()
+		if err!= nil {
+			return
+		}
+
+		err = stmt.QueryRow(comment.ClassId, comment.CommentId).Scan(&bad)
+		if err != nil {
+			return
+		}
+		// addの場合
+		if addOrReduce {
+			bad++
+			statement = `UPDATE comments SET bad=? WHERE classId=? AND commentId=?`
+			stmt, err = db.Prepare(statement)
+			defer stmt.Close()
+			if err!= nil {
+				return
+			}
+			_, err = stmt.Exec(bad, comment.ClassId, comment.CommentId)
+			if err != nil {
+				return
+			}
+			result = true
+			return
+
+		// reduceの場合
+		} else {
+			bad--
+			if bad < 0 {
+				return
+			}
+			statement = `UPDATE comments SET bad=? WHERE classId=? AND commentId=?`
+			stmt, err = db.Prepare(statement)
+			defer stmt.Close()
+			if err!= nil {
+				return
+			}
+			_, err = stmt.Exec(bad, comment.ClassId, comment.CommentId)
+			if err != nil {
+				return
+			}
+			result = true
+			return
+		}
+
+	}
+
 }

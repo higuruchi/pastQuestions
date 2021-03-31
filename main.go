@@ -3,14 +3,9 @@ package main
 import (
 	"net/http"
 	"fmt"
-	// "pastQuestions/api/loginLogout"
-	// "pastQuestions/api/students"
-	// "pastQuestions/api/classes"
-	// "pastQuestions/api/comments"
 	"./api/classes"
 	"./api/students"
 	"./api/comments"
-	"./api/commentReplies"
 	"./api/loginLogout"
 	"github.com/gorilla/sessions"
 )
@@ -26,8 +21,8 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
 	mux.HandleFunc("/students/", students.Students)
 	mux.HandleFunc("/classes/", classes.Classes)
-	mux.HandleFunc("/comments/", comments.Comments)
-	mux.HandleFunc("/commentReplies/", commentReplies.CommentReplies)
+	mux.HandleFunc("/comments/main/", comments.Comments)
+	mux.HandleFunc("/comments/reply/", comments.CommentReplies)
 	mux.HandleFunc("/login", login)
 	
 	server := &http.Server{
