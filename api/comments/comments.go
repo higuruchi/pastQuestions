@@ -58,6 +58,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 
 			comment.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
 			comment.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{7}`)
+			comment.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
 			// tmp, _ = checkInput(r.PostFormValue("comment"), `.+`)
 			// comment.CommentId, _ = strconv.Atoi(tmp)
 

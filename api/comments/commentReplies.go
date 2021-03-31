@@ -2,12 +2,8 @@ package comments
 
 import (
 	"net/http"
-	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
-	// "fmt"
-	// "strings"
-	"regexp"
 	"strconv"
 )
 
@@ -23,33 +19,6 @@ type CommentReply struct {
 	Bad int `json:"bad"`
 }
 
-type Result struct {
-	Result bool `json:"result"`
-	Body []CommentReply `json:"body"`
-}
-
-var db *sql.DB
-
-func init() {
-	var err error
-	db, err = sql.Open("mysql", "root:Fumiya_0324@/pastQuestions")
-	if err != nil {
-		panic(err)
-	}
-}
-
-func checkInput(val string, check string) (ret string, err bool) {
-	r := regexp.MustCompile(check)
-	if r.MatchString(val) {
-		err = false
-		ret = val
-		return
-	} else {
-		err = true
-		return
-	}
-}
-
 func CommentReplies(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 		case "POST":
@@ -59,8 +28,10 @@ func CommentReplies(w http.ResponseWriter, r *http.Request) {
 			result := new(Result)
 
 			commentReply.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{0,7}`)
-			tmp, _ = checkInput(r.PostFormValue("comment"), `.+`)
+			tmp, _ = checkInput(r.PostFormValue("commentId"), `.+`)
 			commentReply.CommentId, _ = strconv.Atoi(tmp)
+			commentReply.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
+			commentReply.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
 
 			if flg {
 				result.Result = false
