@@ -3,10 +3,15 @@ package main
 import (
 	"net/http"
 	"fmt"
-	"pastQuestions/api/loginLogout"
-	"pastQuestions/api/students"
-	"pastQuestions/api/classes"
-	"pastQuestions/api/comments"
+	// "pastQuestions/api/loginLogout"
+	// "pastQuestions/api/students"
+	// "pastQuestions/api/classes"
+	// "pastQuestions/api/comments"
+	"./api/classes"
+	"./api/students"
+	"./api/comments"
+	"./api/commentReplies"
+	"./api/loginLogout"
 	"github.com/gorilla/sessions"
 )
 
@@ -22,6 +27,7 @@ func main() {
 	mux.HandleFunc("/students/", students.Students)
 	mux.HandleFunc("/classes/", classes.Classes)
 	mux.HandleFunc("/comments/", comments.Comments)
+	mux.HandleFunc("/commentsReply/", commentReplies.CommentReplies)
 	mux.HandleFunc("/login", login)
 	
 	server := &http.Server{
