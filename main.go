@@ -29,7 +29,7 @@ func main() {
 		Addr: "192.168.33.10:8080",
 		Handler: mux,
 	}
-	fmt.Println("8080番ポートにてサーバが稼働しています")
+	fmt.Println("8080番ポートにて過去問データベースが稼働しています")
 	server.ListenAndServe()
 }
 

@@ -18,11 +18,19 @@ PUT /classes/<classId>
     <form>
     <className name="className">
     </form>
-
 DELETE /CLASSES/<classId>
 
 api:comments
-POST /comments/
+POST /comments/main/
+    <form>
+    <studentId name="studentId">
+    <classId name="classId">
+    <comment name="comment">
+    </form>
+GET /comments/main/?classId=<classId>&commentId=<commentId>
+PUT /comments/main/<good or bad>/<bool (add->true reduce->false)>/<classId>/<commentId>
+
+POST /comments/reply/
     <form>
     <studentId name="studentId">
     <classId name="classId">
