@@ -1,14 +1,8 @@
-package comments
+package commentMains
 
 import (
-	"net/http"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"encoding/json"
-	// "fmt"
-	"regexp"
-	"strings"
-	"strconv"
 )
 
 type Comment struct {
@@ -36,106 +30,14 @@ func init() {
 	}
 }
 
-func checkInput(val string, check string) (ret string, err bool) {
-	r := regexp.MustCompile(check)
-	if r.MatchString(val) {
-		err = false
-		ret = val
-		return
-	} else {
-		err = true
-		return
-	}
-}
-
-func Comments(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-		case "POST":
-			flg := false
-			// var tmp string
-			comment := new(Comment)
-			result := new(Result)
-
-			comment.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
-			comment.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{7}`)
-			comment.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
-			// tmp, _ = checkInput(r.PostFormValue("comment"), `.+`)
-			// comment.CommentId, _ = strconv.Atoi(tmp)
-
-			if flg {
-				result.Result = false	
-			} else {
-				if comment.AddComment() {
-					result.Result = true
-					result.Body = append(result.Body, *comment)
-				} else {
-					result.Result = false
-				}
-			}
-			
-			json, _ := json.Marshal(result)
-			w.Write(json)
-		case "GET":
-			flg := false
-			var tmp string
-			comment := new(Comment)
-			result := new(Result)
-
-			comment.ClassId, flg = checkInput(r.FormValue("classId"), `[0-9]{0,7}`)
-			tmp, _ = checkInput(r.FormValue("commentId"), ``)
-			comment.CommentId, _ = strconv.Atoi(tmp)
-
-			if flg {
-				result.Result = false
-			} else {
-				if ret, flg := comment.GetComment(); flg {
-					result.Result = true
-					result.Body = ret
-				} else {
-					result.Result = false
-				}
-			}
-
-			json, _ := json.Marshal(result)
-			w.Write(json)
-
-		case "PUT":
-			result := new(Result)
-			comment := new(Comment)
-			parsedUri := strings.Split(r.RequestURI, "/")
-			changeCommand := parsedUri[3]
-			comment.ClassId = parsedUri[5]
-			comment.CommentId, _ = strconv.Atoi(parsedUri[6])
-
-			
-			switch changeCommand {
-				case "good":
-					addOrReduce, _ := strconv.ParseBool(parsedUri[4]) 
-					if addOrReduce {
-						result.Result = comment.GoodAndBad(true, true)
-					} else {
-						result.Result = comment.GoodAndBad(true, false)
-					}
-					json, _ := json.Marshal(result)
-					w.Write(json)
-				case "bad":
-					addOrReduce, _ := strconv.ParseBool(parsedUri[3]) 
-					if addOrReduce {
-						result.Result = comment.GoodAndBad(false, true)
-					} else {
-						result.Result = comment.GoodAndBad(false, false)
-					}
-					json, _ := json.Marshal(result)
-					w.Write(json)
-
-			}
-		// case "DELETE":
-	}
-}
 
 func (comment *Comment)AddComment()(result bool) {
 	num := 0
-	statement := `SELECT COUNT(*) 
+	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
+						ELSE (SELECT commentId
+								FROM comments
+								WHERE classId=? 
+								ORDER BY commentId DESC LIMIT 1) END AS commentIdNum
 					FROM comments 
 					WHERE classId=?`
 	stmt, err := db.Prepare(statement)
@@ -144,28 +46,12 @@ func (comment *Comment)AddComment()(result bool) {
 		result = false
 		return
 	}
-	err = stmt.QueryRow(comment.ClassId).Scan(&num)
+	err = stmt.QueryRow(comment.ClassId, comment.ClassId).Scan(&num)
 	if err != nil {
 		result = false
 		return
 	}
-	if num == 0 {
-		num = 1
-	} else {
-		statement = `SELECT commentId FROM comments WHERE classId=? ORDER BY commentId DESC LIMIT 1`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err != nil {
-			result = false
-			return
-		}
-		err = stmt.QueryRow(comment.ClassId).Scan(&num)
-		if err != nil {
-			result = false
-			return
-		}
-		num++
-	}
+	num++
 
 	statement = `INSERT INTO comments (classId, commentId, comment, studentId) VALUES (?, ?, ?, ?)`
 	stmt, err = db.Prepare(statement)
@@ -186,7 +72,8 @@ func (comment *Comment)AddComment()(result bool) {
 }
 
 func (comment *Comment)GetComment()(comments []Comment, result bool) {
-	statement := `SELECT classId, commentId, comment, studentId, good, bad FROM comments WHERE classId=? AND commentId>=?`
+	statement := `SELECT classId, commentId, comment, studentId, good, bad FROM comments
+					WHERE classId=? AND commentId>=?`
 	stmt, err := db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
@@ -240,7 +127,10 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 			return
 		}
 		// addの場合
+
 		if addOrReduce {
+
+
 			good++
 			statement = `UPDATE comments SET good=? WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
@@ -277,6 +167,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 
 	// badの場合
 	} else {
+
 		var bad int
 		statement = `SELECT bad FROM comments WHERE classId=? AND commentId=?`
 		stmt, err = db.Prepare(statement)
@@ -300,6 +191,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 			}
 			_, err = stmt.Exec(bad, comment.ClassId, comment.CommentId)
 			if err != nil {
+
 				return
 			}
 			result = true

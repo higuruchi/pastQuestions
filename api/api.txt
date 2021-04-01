@@ -1,5 +1,10 @@
 api:students
 POST /students/
+    <form>
+    <studentId name="studentId"
+    <name name="name">
+    <password password="password">
+    </form>
 DELETE /students/<studentId>
 PUT /students/<studentId>/<key(coloum)>
     <form>
@@ -35,4 +40,5 @@ POST /comments/reply/
     <studentId name="studentId">
     <classId name="classId">
     <comment name="comment">
+    <commentId name="commentId">
     </form>
