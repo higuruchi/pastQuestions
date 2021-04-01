@@ -135,7 +135,9 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 
 func (comment *Comment)AddComment()(result bool) {
 	num := 0
-	statement := `SELECT COUNT(*) FROM comments WHERE classId=?`
+	statement := `SELECT COUNT(*) 
+					FROM comments 
+					WHERE classId=?`
 	stmt, err := db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
