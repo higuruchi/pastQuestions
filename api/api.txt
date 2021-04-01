@@ -35,4 +35,5 @@ POST /comments/reply/
     <studentId name="studentId">
     <classId name="classId">
     <comment name="comment">
+    <commentId name="commentId">
     </form>

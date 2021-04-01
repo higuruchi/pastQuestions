@@ -5,6 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
 	"strconv"
+	"fmt"
 )
 
 type CommentReply struct {
@@ -39,6 +40,7 @@ func CommentReplies(w http.ResponseWriter, r *http.Request) {
 			} else {
 				if commentReply.AddReplyComments() {
 					result.Result = true
+					result.Body = append(result.Bdoy, *commentReply)
 				} else {
 					result.Result = false
 				}
@@ -51,32 +53,21 @@ func CommentReplies(w http.ResponseWriter, r *http.Request) {
 
 func (commentReply *CommentReply)AddReplyComments() (result bool) {
 	num := 0
-	statement := `SELECT COUNT(*) FROM commentReplies WHERE classId=?`
+	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
+						ELSE (SELECT commentReplyId
+								FROM commentReplies
+								WHERE classId=? AND commentId=?
+								ORDER BY commentReplyId DESC LIMIT 1) END AS commentIdNum
+					FROM commentReplies
+					WHERE classId=?`
 	stmt, err := db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
 		result = false
 		return
 	}
-	err = stmt.QueryRow(commentReply.ClassId).Scan(&num)
-
-	if num == 0 {
-		num = 1
-	} else {
-		statement = `SELECT commentId FROM commentReplies WHERE classId=? AND commentId=? ORDER BY commentReplyId DESC LIMIT 1`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err != nil {
-			result = false
-			return
-		}
-		err = stmt.QueryRow(commentReply.ClassId, commentReply.CommentId).Scan(&num)
-		if err != nil {
-			result = false
-			return
-		}
-		num++
-	}
+	err = stmt.QueryRow(commentReply.ClassId, commentReply.CommentId, commentReply.ClassId).Scan(&num)
+	num++
 
 	statement = `INSERT INTO commentReplies (classId, commentId, commentReplyId, comment, studentId) VALUES (?, ?, ?, ?, ?)`
 	stmt, err = db.Prepare(statement)
@@ -87,9 +78,11 @@ func (commentReply *CommentReply)AddReplyComments() (result bool) {
 	}
 	_, err = stmt.Exec(commentReply.ClassId, commentReply.CommentId, num, commentReply.Comment, commentReply.StudentId)
 	if err != nil {
+		fmt.Printf("%v\n", err)
 		result = false
 		return
 	}
+	commentReply.CommentReplyId = num
 	result = true
 	return
 }

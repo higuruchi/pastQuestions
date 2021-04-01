@@ -135,7 +135,11 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 
 func (comment *Comment)AddComment()(result bool) {
 	num := 0
-	statement := `SELECT COUNT(*) 
+	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
+						ELSE (SELECT commentId
+								FROM comments
+								WHERE classId=? 
+								ORDER BY commentId DESC LIMIT 1) END AS commentIdNum
 					FROM comments 
 					WHERE classId=?`
 	stmt, err := db.Prepare(statement)
@@ -144,28 +148,12 @@ func (comment *Comment)AddComment()(result bool) {
 		result = false
 		return
 	}
-	err = stmt.QueryRow(comment.ClassId).Scan(&num)
+	err = stmt.QueryRow(comment.ClassId, comment.ClassId).Scan(&num)
 	if err != nil {
 		result = false
 		return
 	}
-	if num == 0 {
-		num = 1
-	} else {
-		statement = `SELECT commentId FROM comments WHERE classId=? ORDER BY commentId DESC LIMIT 1`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err != nil {
-			result = false
-			return
-		}
-		err = stmt.QueryRow(comment.ClassId).Scan(&num)
-		if err != nil {
-			result = false
-			return
-		}
-		num++
-	}
+	num++
 
 	statement = `INSERT INTO comments (classId, commentId, comment, studentId) VALUES (?, ?, ?, ?)`
 	stmt, err = db.Prepare(statement)
