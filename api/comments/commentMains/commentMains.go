@@ -98,7 +98,9 @@ func (comment *Comment)GetComment()(comments []Comment, result bool) {
 func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool) {
 	num := 0
 
-	statement := `SELECT COUNT(*) FROM comments WHERE classId=? AND commentId=?`
+	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
+						ELSE 1 END
+					FROM comments WHERE classId=? AND commentId=?`
 	stmt, err := db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
@@ -114,31 +116,24 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 	}
 	// goodの場合
 	if goodOrBad {
-		var good int
-		statement = `SELECT good FROM comments WHERE classId=? AND commentId=?`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err!= nil {
-			return
-		}
-
-		err = stmt.QueryRow(comment.ClassId, comment.CommentId).Scan(&good)
-		if err != nil {
-			return
-		}
 		// addの場合
-
 		if addOrReduce {
-
-
-			good++
-			statement = `UPDATE comments SET good=? WHERE classId=? AND commentId=?`
+			statement = `UPDATE comments
+						SET good = (
+							SELECT good
+							FROM (
+								SELECT good+1 AS good
+								FROM comments
+								WHERE classId=? AND commentId=?
+							) TMP
+						)
+						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
 			if err!= nil {
 				return
 			}
-			_, err = stmt.Exec(good, comment.ClassId, comment.CommentId)
+			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
 			if err != nil {
 				return
 			}
@@ -147,17 +142,29 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 
 		// reduceの場合
 		} else {
-			good--
-			if good < 0 {
-				return
-			}
-			statement = `UPDATE comments SET good=? WHERE classId=? AND commentId=?`
+			// good--
+			// if good < 0 {
+			// 	return
+			// }
+			statement = `UPDATE comments
+						SET good = (
+							SELECT good
+							FROM (
+								SELECT (CASE 
+										WHEN good = 0 THEN 0
+										WHEN good > 0 THEN good - 1
+										ELSE good END) AS good 
+								FROM comments
+								WHERE classId=? AND commentId=?
+							) TMP
+						)
+						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
 			if err!= nil {
 				return
 			}
-			_, err = stmt.Exec(good, comment.ClassId, comment.CommentId)
+			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
 			if err != nil {
 				return
 			}
@@ -168,28 +175,24 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 	// badの場合
 	} else {
 
-		var bad int
-		statement = `SELECT bad FROM comments WHERE classId=? AND commentId=?`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err!= nil {
-			return
-		}
-
-		err = stmt.QueryRow(comment.ClassId, comment.CommentId).Scan(&bad)
-		if err != nil {
-			return
-		}
 		// addの場合
 		if addOrReduce {
-			bad++
-			statement = `UPDATE comments SET bad=? WHERE classId=? AND commentId=?`
+			statement = `UPDATE comments
+						SET bad = (
+							SELECT bad
+							FROM (
+								SELECT bad+1 AS bad
+								FROM comments
+								WHERE classId=? AND commentId=?
+							) TMP
+						)
+						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
 			if err!= nil {
 				return
 			}
-			_, err = stmt.Exec(bad, comment.ClassId, comment.CommentId)
+			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
 			if err != nil {
 
 				return
@@ -199,17 +202,25 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 
 		// reduceの場合
 		} else {
-			bad--
-			if bad < 0 {
-				return
-			}
-			statement = `UPDATE comments SET bad=? WHERE classId=? AND commentId=?`
+			statement = `UPDATE comments
+						SET bad = (
+							SELECT bad
+							FROM (
+								SELECT (CASE 
+										WHEN bad = 0 THEN 0
+										WHEN bad > 0 THEN bad - 1
+										ELSE bad END) AS bad 
+								FROM comments
+								WHERE classId=? AND commentId=?
+							) TMP
+						)
+						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
 			if err!= nil {
 				return
 			}
-			_, err = stmt.Exec(bad, comment.ClassId, comment.CommentId)
+			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
 			if err != nil {
 				return
 			}

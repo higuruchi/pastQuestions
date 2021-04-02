@@ -33,7 +33,7 @@ POST /comments/main/
     <comment name="comment">
     </form>
 GET /comments/main/?classId=<classId>&commentId=<commentId>
-PUT /comments/main/<good or bad>/<bool (add->true reduce->false)>/<classId>/<commentId>
+PUT /comments/main/<good or bad>/<add or reduce>/<classId>/<commentId>
 
 POST /comments/reply/
     <form>
@@ -42,3 +42,20 @@ POST /comments/reply/
     <comment name="comment">
     <commentId name="commentId">
     </form>
+
+
+
+
+UPDATE comments
+SET good = (
+    SELECT good
+    FROM (
+        SELECT (CASE 
+                WHEN good = 0 THEN 0
+                WHEN good > 0 THEN good - 1
+                ELSE good END) AS good 
+        FROM comments
+        WHERE classId=5005040 AND commentId=1
+    ) TMP
+)
+WHERE classId=5005040 AND commentId=1

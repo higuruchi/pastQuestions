@@ -87,19 +87,19 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 			
 			switch changeCommand {
 				case "good":
-					addOrReduce, _ := strconv.ParseBool(parsedUri[4]) 
-					if addOrReduce {
+					addOrReduce := parsedUri[4]
+					if addOrReduce == "add" {
 						result.Result = comment.GoodAndBad(true, true)
-					} else {
+					} else if addOrReduce == "reduce" {
 						result.Result = comment.GoodAndBad(true, false)
 					}
 					json, _ := json.Marshal(result)
 					w.Write(json)
 				case "bad":
-					addOrReduce, _ := strconv.ParseBool(parsedUri[4]) 
-					if addOrReduce {
+					addOrReduce := parsedUri[4] 
+					if addOrReduce == "add" {
 						result.Result = comment.GoodAndBad(false, true)
-					} else {
+					} else if addOrReduce == "reduce" {
 						result.Result = comment.GoodAndBad(false, false)
 					}
 					json, _ := json.Marshal(result)
