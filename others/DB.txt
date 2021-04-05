@@ -49,9 +49,10 @@ CREATE TABLE pastQuestions(
     year INT UNSIGNED NOT NULL,
     #1：1クオーター、2：2クオーター、3：3クオーター、4：4クオーター
     semester INT UNSIGNED NOT NULL,
+    fileId INT NOT NULL,
     fileName VARCHAR(30),
 
-    PRIMARY KEY (classId, year, semester),
+    PRIMARY KEY (classId, year, semester, fileId),
     FOREIGN KEY (classId) REFERENCES classes(classId),
     CHECK (semester BETWEEN 1 AND 4)
 );

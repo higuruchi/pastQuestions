@@ -5,16 +5,14 @@ import (
 	"fmt"
 	"./api/classes"
 	"./api/students"
-	// "./api/comments/main"
-	// "./api/comments/reply"
 	"./api/comments"
+	"./api/pastQuestions"
 	"./api/loginLogout"
-	"github.com/gorilla/sessions"
+	// "github.com/gorilla/sessions"
 )
 
-var sessionName = "gsid"
-
-var store = sessions.NewCookieStore([]byte(sessionName))
+// var sessionName = "gsid"
+// var store = sessions.NewCookieStore([]byte(sessionName))
 
 func main() {
 	mux := http.NewServeMux()
@@ -25,7 +23,8 @@ func main() {
 	mux.HandleFunc("/classes/", classesFront.Classes)
 	mux.HandleFunc("/comments/main/", commentsFront.Comments)
 	mux.HandleFunc("/comments/reply/", commentsFront.CommentReplies)
-	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/login", loginLogoutFront.Login)
+	mux.HandleFunc("/pastQuestion/", pastQuestionsFront.PastQuestions)
 	
 	server := &http.Server{
 		Addr: "192.168.33.10:8080",
@@ -33,24 +32,4 @@ func main() {
 	}
 	fmt.Println("8080番ポートにて過去問データベースが稼働しています")
 	server.ListenAndServe()
-}
-
-func login(w http.ResponseWriter, r *http.Request) {
-	studentId := r.PostFormValue("studentId")
-	password := r.PostFormValue("password")
-	student, _ := loginLogout.Login(studentId, password)
-
-	if student.StudentId != ""{
-		session, _ := store.Get(r, sessionName)
-		session.Values["StudentId"] = student.StudentId
-		session.Values["Name"] = student.Name
-		session.Values["Email"] = student.Email
-		err := session.Save(r, w)
-		if err != nil {
-			fmt.Println(w, err)
-		}
-		fmt.Printf("%v", session)
-	} else {
-		fmt.Println("bad")
-	}
 }

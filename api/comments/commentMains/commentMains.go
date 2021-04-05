@@ -94,7 +94,6 @@ func (comment *Comment)GetComment()(comments []Comment, result bool) {
 	return
 }
 
-// goodOrBad : true->good, false->bad  addOrReduce : true->add, false->reduce 
 func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool) {
 	num := 0
 

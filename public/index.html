@@ -9,10 +9,8 @@
         <h1>過去問データベース</h1>
         <i class="fas fa-sign-in-alt"></i>
 
-        <form method="post" action="http://192.168.33.10:8080/students">
-            <input type="text" name="studentId" placeholder="学籍番号">
-            <input type="text" name="name" placeholder="名前">
-            <input type="text" name="password" placeholder="パスワード">
+        <form method="post" action="http://192.168.33.10:8080/pastQuestion/" enctype="multipart/form-data">
+            <input type="file" name="pastQuestion">
             <input type="submit" value="送信">
         </form>
     </header>
