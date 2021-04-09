@@ -78,7 +78,6 @@ func (student *Student)DeleteStudent() (result bool) {
 	statement := `SELECT studentId, name, COUNT(*) OVER() FROM students WHERE studentId=?`
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		fmt.Printf("%v\n", err)
 		return
 	}
 	defer stmt.Close()
@@ -104,6 +103,7 @@ func (student *Student)DeleteStudent() (result bool) {
 func (student *Student)ModifyStudent(key string, val string, password string) (result bool) {
 	result = false
 	num := 0
+	password = encriptPassword(password)
 
 	statement := `SELECT COUNT(*) OVER() FROM students WHERE studentId=? AND password=?`
 	stmt, err := db.Prepare(statement)
@@ -116,7 +116,7 @@ func (student *Student)ModifyStudent(key string, val string, password string) (r
 		return
 	}
 	if num != 0 {
-		switch key{
+		switch key {
 			case "eMail":
 				statement = `UPDATE students SET eMail=? WHERE studentId=?`
 			case "name":
@@ -126,8 +126,6 @@ func (student *Student)ModifyStudent(key string, val string, password string) (r
 		}
 		stmt, err = db.Prepare(statement)
 		if err != nil {
-			fmt.Printf("%v\n", err)
-
 			return
 		}
 		_, err = stmt.Exec(val, student.StudentId)

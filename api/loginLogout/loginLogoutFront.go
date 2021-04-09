@@ -47,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if student.Login(password) {
 
 		session, _ := store.Get(r, sessionName)
-		session.Value["login"] = true
+		session.Values["login"] = true
 		session.Values["StudentId"] = student.StudentId
 		session.Values["studentName"] = student.StudentName
 		err := session.Save(r, w)
