@@ -54,26 +54,56 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 			pastQuestion.Semester = semester
 
 			if flg {
-				result.Result = false
-			} else {
-				fileHeader := r.MultipartForm.File["pastQuestion"][0]
-				file, err := fileHeader.Open()
-				if err != nil {
-					return
-				}
-
-				data, _ := ioutil.ReadAll(file)
-				result.Result = pastQuestion.SavePastQuestion(data)
-				result.Body = append(result.Body, *pastQuestion)
+				w.WriteHeader(400)
 			}
-			
 
+			fileHeader := r.MultipartForm.File["pastQuestion"][0]
+			file, err := fileHeader.Open()
+			if err != nil {
+				return
+			}
+
+			data, _ := ioutil.ReadAll(file)
+			result.Result = pastQuestion.SavePastQuestion(data)
+			result.Body = append(result.Body, *pastQuestion)
 			json, _ := json.Marshal(result)
 			w.Write(json)
+			
+			
+
 		
-		// case "GET":
-		// 	result := new(pastQuestionsObj.Request)
-		// 	pastQuestion := new(pastQuestionsObj.pastQuestion)
+		case "GET":
+			var flg bool
+			var tmp string
+			pastQuestion := new(pastQuestionsObj.PastQuestion)
+			parsedUri := strings.Split(r.RequestURI, "/")
+
+			pastQuestion.ClassId, flg = checkInput(parsedUri[2], `[0-9]{0,7}`)
+			tmp, flg = checkInput(parsedUri[3], `\d{4}`)
+			pastQuestion.Year, _ = strconv.Atoi(tmp)
+			tmp, flg = checkInput(parsedUri[4], `[1-4]`)
+			pastQuestion.Semester, _ = strconv.Atoi(tmp)
+
+			if flg {
+				w.WriteHeader(400)
+			} else {
+				data, flg := pastQuestion.GetPastQuestion()
+
+				if !flg {
+					w.WriteHeader(404)
+				} else {
+					// fileName, _ := pastQuestion.GetPastQuestion()
+					// data, _ := ioutil.ReadFile(fileName)
+					// buf := make([]byte, 32 << 20)
+					// data.Read(buf)
+					w.Header().Set("Content-Disposition", "attachment; filename=pastQuestion.pdf")
+					w.Header().Set("Content-Type", "application/pdf")
+					w.Header().Set("Content-Length", string(len(data)))
+					w.Write(data)
+
+				}
+			}
+
 
 	}
 }

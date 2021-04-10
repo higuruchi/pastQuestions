@@ -7,7 +7,8 @@ import (
 	"os"
 	"math/rand"
 	"time"
-	// "fmt"
+	"io/ioutil"
+	"fmt"
 )
 
 type PastQuestion struct {
@@ -65,13 +66,14 @@ func (pastQuestion *PastQuestion)SavePastQuestion(file []byte) (result bool) {
 	}
 
 	statement := `SELECT CASE
-					WHEN COUNT(*)=0 THEN 0
-					ELSE  (SELECT fileId
-							FROM pastQuestions
-							WHERE classId=? AND year=? AND semester=?
-							ORDER BY fileId DESC LIMIT 1) END AS newFileId
+					WHEN COUNT(*)=0 THEN "nothing"
+					ELSE (
+					SELECT fileName
 					FROM pastQuestions
-					WHERE classId=? AND year=? AND semester=?`
+					WHERE classId=? AND year=? AND semester=?
+					ORDER BY fileId DESC LIMIT 1) END AS fileName
+				FROM pastQuestions
+				WHERE classId=? AND year=? AND semester=?`
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		return
@@ -90,7 +92,6 @@ func (pastQuestion *PastQuestion)SavePastQuestion(file []byte) (result bool) {
 	}
 	_, err = stmt.Exec(pastQuestion.ClassId, pastQuestion.Year, pastQuestion.Semester, newFileId, fileName)
 	if err != nil {
-		fmt.Println("6\n\n")
 		return
 	}
 
@@ -99,6 +100,38 @@ func (pastQuestion *PastQuestion)SavePastQuestion(file []byte) (result bool) {
 
 	f.Write(file)
 	pastQuestion.FileId = newFileId
+	result = true
+	return
+}
+
+func (pastQuestion *PastQuestion)GetPastQuestion() (data []byte, result bool){
+	var fileName string
+
+	statement := `SELECT CASE
+					WHEN COUNT(*)=0 THEN "nothing"
+					ELSE (SELECT fileName
+						FROM pastQuestions
+						WHERE classId=? AND year=? AND semester=?
+						ORDER BY fileId DESC LIMIT 1) END AS fileName
+					FROM pastQuestions
+				WHERE classId=? AND year=? AND semester=?`
+	
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		return
+	}
+	err = stmt.QueryRow(pastQuestion.ClassId, pastQuestion.Year, pastQuestion.Semester, pastQuestion.ClassId, pastQuestion.Year, pastQuestion.Semester).Scan(&fileName)
+	if fileName == "nothing" {
+		return
+	}
+	fmt.Printf("ここです%v\n", fileName)
+	fileName = "./pastQuestions/"+fileName+".pdf"
+	// file, _ = os.Open("./pastQuestions/"+fileName+".pdf")
+	// data, _ = ioutil.ReadAll(file)
+	if err != nil {
+		return
+	}
+	data, _ = ioutil.ReadFile(fileName)
 	result = true
 	return
 }
