@@ -95,3 +95,20 @@ INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070",
 
 
 SELECT CASE WHEN commentId IS NULL THEN 0 ELSE commentId END commentId FROM comments WHERE classId="5005070" ORDER BY commentId DESC LIMIT 1
+
+INSERT INTO questionBoards Q1 (classId, questionBoardId, studentId, question)
+VALUES (
+    "5005040",
+    SELECT CASE
+            WHEN COUNT(*)=0 THEN 1
+            ELSE (
+                SELECT questionBoardId+1
+                FROM questionBoards Q2
+                WHERE classId="5005040"
+                ORDER BY questionBoardId DESC LIMIT 1
+            ) END
+    FROM questionBoards Q3
+    WHERE classId="5005040",
+    "5005040",
+    "this is test question"
+)

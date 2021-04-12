@@ -8,21 +8,10 @@ import (
 	"strconv"
 	"./commentMains"
 	"./commentReplies"
-	"regexp"
+	// "regexp"
+	"../common"
 	// "fmt"
 )
-
-func checkInput(val string, check string) (ret string, err bool) {
-	r := regexp.MustCompile(check)
-	if r.MatchString(val) {
-		err = false
-		ret = val
-		return
-	} else {
-		err = true
-		return
-	}
-}
 
 func Comments(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -32,10 +21,10 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 			comment := new(commentMains.Comment)
 			result := new(commentMains.Result)
 
-			comment.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
-			comment.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{7}`)
-			comment.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
-			// tmp, _ = checkInput(r.PostFormValue("comment"), `.+`)
+			comment.StudentId, flg = common.CheckInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
+			comment.ClassId, flg = common.CheckInput(r.PostFormValue("classId"), `[0-9]{7}`)
+			comment.Comment, flg = common.CheckInput(r.PostFormValue("comment"), `.+`)
+			// tmp, _ = common.CheckInput(r.PostFormValue("comment"), `.+`)
 			// comment.CommentId, _ = strconv.Atoi(tmp)
 
 			if flg {
@@ -58,8 +47,8 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 			comment := new(commentMains.Comment)
 			result := new(commentMains.Result)
 
-			comment.ClassId, flg = checkInput(r.FormValue("classId"), `[0-9]{0,7}`)
-			tmp, _ = checkInput(r.FormValue("commentId"), ``)
+			comment.ClassId, flg = common.CheckInput(r.FormValue("classId"), `[0-9]{0,7}`)
+			tmp, _ = common.CheckInput(r.FormValue("commentId"), ``)
 			comment.CommentId, _ = strconv.Atoi(tmp)
 
 			if flg {
@@ -118,11 +107,11 @@ func CommentReplies(w http.ResponseWriter, r *http.Request) {
 			commentReply := new(commentReplies.CommentReply)
 			result := new(commentReplies.Result)
 
-			commentReply.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{0,7}`)
-			tmp, _ = checkInput(r.PostFormValue("commentId"), `.+`)
+			commentReply.ClassId, flg = common.CheckInput(r.PostFormValue("classId"), `[0-9]{0,7}`)
+			tmp, _ = common.CheckInput(r.PostFormValue("commentId"), `.+`)
 			commentReply.CommentId, _ = strconv.Atoi(tmp)
-			commentReply.Comment, flg = checkInput(r.PostFormValue("comment"), `.+`)
-			commentReply.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
+			commentReply.Comment, flg = common.CheckInput(r.PostFormValue("comment"), `.+`)
+			commentReply.StudentId, flg = common.CheckInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
 
 			if flg {
 				result.Result = false

@@ -7,24 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"regexp"
+	// "regexp"
 	"./studentsObj"
+	"../common"
 	// "golang.org/x/crypto/bcrypt"
 )
-
-
-
-func checkInput(val string, check string) (ret string, err bool) {
-	r := regexp.MustCompile(check)
-	if r.MatchString(val) {
-		err = false
-		ret = val
-		return
-	} else {
-		err = true
-		return
-	}
-}
 
 func Students(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf8")
@@ -38,9 +25,9 @@ func Students(w http.ResponseWriter, r *http.Request) {
 				password string
 			)
 
-			student.StudentId, flg = checkInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
-			student.Name, flg = checkInput(r.PostFormValue("name"), ``)
-			password, flg = checkInput(r.PostFormValue("password"), `[0-9a-zA-Z]{4,}`)
+			student.StudentId, flg = common.CheckInput(r.PostFormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
+			student.Name, flg = common.CheckInput(r.PostFormValue("name"), ``)
+			password, flg = common.CheckInput(r.PostFormValue("password"), `[0-9a-zA-Z]{4,}`)
 			// hash,_ := bcrypt.GenerateFromPassword([]byte(password),12)
 			// fmt.Printf("%v\n", hash)
 
@@ -101,7 +88,7 @@ func Students(w http.ResponseWriter, r *http.Request) {
 			// condition := make(map[string]string)
 			result := new(studentsObj.Result)
 			// query := r.URL.Query()
-			studentId, flg := checkInput(r.FormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
+			studentId, flg := common.CheckInput(r.FormValue("studentId"), `[0-9]{2}[A-Z][0-9]{3}`)
 			fmt.Printf("%v\n", flg)
 			if flg {
 				result.Result = false

@@ -8,25 +8,14 @@ import (
 	// _ "github.com/go-sql-driver/mysql"
 	"strings"
 	"strconv"
-	"regexp"
+	// "regexp"
+	"../common"
 	// "fmt"
 	// "os"
 	// "io"
 	// "math/rand"
 	// "time"
 )
-
-func checkInput(val string, check string) (ret string, err bool) {
-	r := regexp.MustCompile(check)
-	if r.MatchString(val) {
-		err = false
-		ret = val
-		return
-	} else {
-		err = true
-		return
-	}
-}
 
 
 // ファイル名は乱数で決定
@@ -47,7 +36,7 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			pastQuestion.ClassId, flg = checkInput(parsedUri[2], `[0-9]{0,7}`)
+			pastQuestion.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
 			year, _ := strconv.Atoi(parsedUri[3])
 			pastQuestion.Year = year
 			semester, _ := strconv.Atoi(parsedUri[4])
@@ -55,20 +44,20 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 
 			if flg {
 				w.WriteHeader(400)
+			} else {
+				fileHeader := r.MultipartForm.File["pastQuestion"][0]
+				file, err := fileHeader.Open()
+				if err != nil {
+					return
+				}
+	
+				data, _ := ioutil.ReadAll(file)
+				result.Result = pastQuestion.SavePastQuestion(data)
+				result.Body = append(result.Body, *pastQuestion)
+				json, _ := json.Marshal(result)
+				w.Write(json)
 			}
 
-			fileHeader := r.MultipartForm.File["pastQuestion"][0]
-			file, err := fileHeader.Open()
-			if err != nil {
-				return
-			}
-
-			data, _ := ioutil.ReadAll(file)
-			result.Result = pastQuestion.SavePastQuestion(data)
-			result.Body = append(result.Body, *pastQuestion)
-			json, _ := json.Marshal(result)
-			w.Write(json)
-			
 			
 
 		
@@ -78,10 +67,10 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 			pastQuestion := new(pastQuestionsObj.PastQuestion)
 			parsedUri := strings.Split(r.RequestURI, "/")
 
-			pastQuestion.ClassId, flg = checkInput(parsedUri[2], `[0-9]{0,7}`)
-			tmp, flg = checkInput(parsedUri[3], `\d{4}`)
+			pastQuestion.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+			tmp, flg = common.CheckInput(parsedUri[3], `\d{4}`)
 			pastQuestion.Year, _ = strconv.Atoi(tmp)
-			tmp, flg = checkInput(parsedUri[4], `[1-4]`)
+			tmp, flg = common.CheckInput(parsedUri[4], `[1-4]`)
 			pastQuestion.Semester, _ = strconv.Atoi(tmp)
 
 			if flg {

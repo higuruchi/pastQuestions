@@ -8,6 +8,7 @@ import (
 	"./api/comments"
 	"./api/pastQuestions"
 	"./api/loginLogout"
+	"./api/questionBoards"
 	// "github.com/gorilla/sessions"
 )
 
@@ -25,6 +26,7 @@ func main() {
 	mux.HandleFunc("/comments/reply/", commentsFront.CommentReplies)
 	mux.HandleFunc("/login", loginLogoutFront.Login)
 	mux.HandleFunc("/pastQuestion/", pastQuestionsFront.PastQuestions)
+	mux.HandleFunc("/questionBoards/", questionBoardsFront.QuestionBoards)
 	
 	server := &http.Server{
 		Addr: "192.168.33.10:8080",

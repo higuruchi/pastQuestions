@@ -3,9 +3,10 @@ package loginLogoutObj
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"crypto/md5"
-	"io"
+	// "crypto/md5"
+	// "io"
 	"fmt"
+	"../../common"
 )
 
 type Student struct {
@@ -27,20 +28,6 @@ func init() {
 	}
 }
 
-func encriptPassword(password string) (string) {
-	h := md5.New()
-	io.WriteString(h, password)
-	pwmd5 := fmt.Sprintf("%x", h.Sum(nil))
-	salt1 := "@#$%"
-	salt2 := "^&*()"
-	io.WriteString(h, salt1)
-	io.WriteString(h, "abc")
-	io.WriteString(h, salt2)
-	io.WriteString(h, pwmd5)
-	password = fmt.Sprintf("%x", h.Sum(nil))
-	return password
-}
-
 func (student *Student)Login(password string)(result bool){
 
 	statement := `SELECT CASE
@@ -54,7 +41,7 @@ func (student *Student)Login(password string)(result bool){
 		return
 	}
 	defer stmt.Close()
-	password = encriptPassword(password)
+	password = common.EncriptPassword(password)
 	err = stmt.QueryRow(student.StudentId, password).Scan(&student.StudentName)
 	if err != nil || student.StudentName == "nothing" {
 

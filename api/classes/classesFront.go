@@ -4,22 +4,12 @@ import (
 	"net/http"
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
-	"regexp"
+	// "regexp"
 	"strings"
 	"./classesObj"
+	"../common"
 )
 
-func checkInput(val string, check string) (ret string, err bool) {
-	r := regexp.MustCompile(check)
-	if r.MatchString(val) {
-		err = false
-		ret = val
-		return
-	} else {
-		err = true
-		return
-	}
-}
 
 func Classes(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf8")
@@ -30,8 +20,8 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			class := new(classesObj.Class)
 			result := new(classesObj.Result)
 
-			class.ClassId, flg = checkInput(r.PostFormValue("classId"), `[0-9]{0,7}`)
-			class.ClassName, flg = checkInput(r.PostFormValue("className"), `.+`)
+			class.ClassId, flg = common.CheckInput(r.PostFormValue("classId"), `[0-9]{0,7}`)
+			class.ClassName, flg = common.CheckInput(r.PostFormValue("className"), `.+`)
 			if flg {
 				result.Result = false
 			} else {
@@ -49,8 +39,8 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			parsedUri := strings.Split(r.RequestURI, "/")
 			class := new(classesObj.Class)
 			result := new(classesObj.Result)
-			class.ClassId, flg = checkInput(parsedUri[2], `[0-9]{0,7}`)
-			class.ClassName, flg = checkInput(r.FormValue("className"), `.+`)
+			class.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+			class.ClassName, flg = common.CheckInput(r.FormValue("className"), `.+`)
 
 			if flg {
 				result.Result = false
@@ -69,7 +59,7 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 			parseUri := strings.Split(r.RequestURI, "/")
 			class := new(classesObj.Class)
 			result := new(classesObj.Result)
-			class.ClassId, flg = checkInput(parseUri[2], `[0-9]{0,7}`)
+			class.ClassId, flg = common.CheckInput(parseUri[2], `[0-9]{0,7}`)
 
 			if flg {
 				result.Result = false	

@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	// "io"
 	"os"
-	"math/rand"
-	"time"
+	// "math/rand"
+	// "time"
 	"io/ioutil"
-	"fmt"
+	// "fmt"
+	"../../common"
 )
 
 type PastQuestion struct {
@@ -47,7 +48,7 @@ func (pastQuestion *PastQuestion)SavePastQuestion(file []byte) (result bool) {
 
 	for flg {
 		num := 0
-		fileName = MakeRandomStr(30)
+		fileName = common.MakeRandomStr(30)
 		statement := `SELECT
 						COUNT(*)
 						FROM pastQuestions
@@ -124,7 +125,6 @@ func (pastQuestion *PastQuestion)GetPastQuestion() (data []byte, result bool){
 	if fileName == "nothing" {
 		return
 	}
-	fmt.Printf("ここです%v\n", fileName)
 	fileName = "./pastQuestions/"+fileName+".pdf"
 	// file, _ = os.Open("./pastQuestions/"+fileName+".pdf")
 	// data, _ = ioutil.ReadAll(file)
@@ -136,22 +136,22 @@ func (pastQuestion *PastQuestion)GetPastQuestion() (data []byte, result bool){
 	return
 }
 
-func MakeRandomStr(digit uint32) (string) {
-    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+// func MakeRandomStr(digit uint32) (string) {
+//     const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-    // 乱数を生成
-    b := make([]byte, digit)
-	rand.Seed(time.Now().UnixNano())
-    if _, err := rand.Read(b); err != nil {
-        return ""
-    }
+//     // 乱数を生成
+//     b := make([]byte, digit)
+// 	rand.Seed(time.Now().UnixNano())
+//     if _, err := rand.Read(b); err != nil {
+//         return ""
+//     }
 
-    // letters からランダムに取り出して文字列を生成
-    var result string
-    for _, v := range b {
-        // index が letters の長さに収まるように調整
-        result += string(letters[int(v)%len(letters)])
-    }
-    return result
-}
+//     // letters からランダムに取り出して文字列を生成
+//     var result string
+//     for _, v := range b {
+//         // index が letters の長さに収まるように調整
+//         result += string(letters[int(v)%len(letters)])
+//     }
+//     return result
+// }
 

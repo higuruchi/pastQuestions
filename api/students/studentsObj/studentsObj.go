@@ -5,8 +5,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"fmt"
 	// "golang.org/x/crypto/bcrypt"
-	"crypto/md5"
-	"io"
+	// "crypto/md5"
+	// "io"
+	"../../common"
 )
 
 type Student struct {
@@ -29,20 +30,6 @@ func init() {
 	}		
 }
 
-func encriptPassword(password string) (string) {
-	h := md5.New()
-	io.WriteString(h, password)
-	pwmd5 := fmt.Sprintf("%x", h.Sum(nil))
-	salt1 := "@#$%"
-	salt2 := "^&*()"
-	io.WriteString(h, salt1)
-	io.WriteString(h, "abc")
-	io.WriteString(h, salt2)
-	io.WriteString(h, pwmd5)
-	password = fmt.Sprintf("%x", h.Sum(nil))
-	return password
-}
-
 func (student *Student)AddStudent(password string) (result bool) {
 	num := 0
 	result = false
@@ -56,7 +43,7 @@ func (student *Student)AddStudent(password string) (result bool) {
 	err = stmt.QueryRow(student.StudentId).Scan(&num)
 
 	if num == 0 {
-		password = encriptPassword(password)
+		password = common.EncriptPassword(password)
 		statement = `INSERT INTO students (studentId, name, password) VALUES (?, ?, ?)`
 		stmt, err = db.Prepare(statement)
 		if err != nil {
@@ -103,7 +90,7 @@ func (student *Student)DeleteStudent() (result bool) {
 func (student *Student)ModifyStudent(key string, val string, password string) (result bool) {
 	result = false
 	num := 0
-	password = encriptPassword(password)
+	password = common.EncriptPassword(password)
 
 	statement := `SELECT COUNT(*) OVER() FROM students WHERE studentId=? AND password=?`
 	stmt, err := db.Prepare(statement)
