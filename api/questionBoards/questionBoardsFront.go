@@ -6,7 +6,7 @@ import (
 	// "database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"encoding/json"
-	"fmt"
+	// "fmt"
 	"strings"
 	"strconv"
 	"./questionBoardsObj"
@@ -15,12 +15,12 @@ import (
 func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf8")
 
-	// /questionBoard/classId/studentId/
 	switch r.Method {
+		// /questionBoard/classId/studentId/
 		case "POST":
 			parsedUri := strings.Split(r.RequestURI, "/")
 			questionBoard := new(questionBoardsObj.QuestionBoard)
-			result := new(questionBoardsObj.Result);
+			result := new(questionBoardsObj.Result)
 			flg := false
 			var tmp string
 
@@ -30,8 +30,6 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 			questionBoard.StudentId, flg = common.CheckInput(parsedUri[4], `[0-9]{2}[A-Z][0-9]{3}`)
 			questionBoard.Question, flg = common.CheckInput(r.PostFormValue("question"), `.+`)
 
-			fmt.Printf("%v\n", questionBoard)
-
 			if flg {
 				w.WriteHeader(400)
 			} else {
@@ -40,8 +38,22 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 				json, _ := json.Marshal(result)
 				w.Write(json)
 			}
-			
+		
+		//  /questionBoard/classId/
+		case "GET":
+			parsedUri := strings.Split(r.RequestURI, "/")
+			questionBoard := new(questionBoardsObj.QuestionBoard)
+			result := new(questionBoardsObj.Result)
+			flg := false
 
+			questionBoard.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+			if flg {
+				w.WriteHeader(400)
+			} else {
+				result.Body, result.Result = questionBoard.GetQuestionBoard()
+				json, _ := json.Marshal(result)
+				w.Write(json)
+			}
 	}
 }
 

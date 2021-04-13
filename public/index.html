@@ -1,26 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>過去問データベース</title>
+    <link rel="stylesheet" href="style.css?1">
 </head>
 <body>
-    <header>
-        <h1>過去問データベース</h1>
-        <i class="fas fa-sign-in-alt"></i>
-
-        <form method="get" action="http://192.168.33.10:8080/pastQuestion/5005040/2020/1/" enctype="multipart/form-data">
-            <input type="submit" value="ファイルゲットだぜ！！">
-        </form>
-    </header>
-    <div>
-        <aside>
-
-        </aside>
-        <div class="main">
-            <!-- <input type="text" name="className">
-            <button>検索</button> -->
-        </div>
+    <input id="menu" type="checkbox">
+    <label for="menu" class="back"></label>
+    <div class="navIconWrap open">
+        <label for="menu" class="navIcon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </label>
     </div>
+    <aside>
+        <nav>
+            <ul>
+                <li>list1</li>
+                <li>list2</li>
+                <li>list3</li>
+                <li>list4</li>
+                <li>list5</li>
+            </ul>
+        </nav>
+        <div class="sideFooter">
+            side footer
+        </div>
+    </aside>
+    <header>
+        <div class="search">
+            <input type="text">
+            <button>検索</button>
+        </div>
+    </header>
+    <main>
+        Main
+    </main>
 </body>
 </html>

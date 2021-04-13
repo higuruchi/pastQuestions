@@ -2,7 +2,7 @@ package questionBoardsObj
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"fmt"
+	// "fmt"
 	"database/sql"
 )
 
@@ -81,11 +81,34 @@ func (questionBoard *QuestionBoard)AddQuestionBoard() (result bool) {
 		}
 		_, err = stmt.Exec(questionBoard.ClassId, num, questionBoard.StudentId, questionBoard.Question)
 		if err != nil {
-			fmt.Printf("%v\n", err)
 			return
 		}
 		result = true
 		return
 	}
+	return
+}
+
+func (questionBoard *QuestionBoard)GetQuestionBoard() (resultQuestionBoard []QuestionBoard, result bool) {
+	statement := `SELECT classId, year, questionBoardId, studentId, question
+					FROM questionBoards
+					WHERE classId=?
+					ORDER BY questionBoardId`
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		return
+	}
+
+	rows, errs := stmt.Query(questionBoard.ClassId)
+	if errs!= nil {
+		return
+	}
+	for rows.Next() {
+		tmpQuestionBoard := new(QuestionBoard)
+		err = rows.Scan(&tmpQuestionBoard.ClassId, &tmpQuestionBoard.Year, &tmpQuestionBoard.QuestionBoardId, &tmpQuestionBoard.StudentId, &tmpQuestionBoard.Question)
+		resultQuestionBoard = append(resultQuestionBoard, *tmpQuestionBoard)
+	}
+	result = true
 	return
 }
