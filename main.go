@@ -27,6 +27,8 @@ func main() {
 	mux.HandleFunc("/login", loginLogoutFront.Login)
 	mux.HandleFunc("/pastQuestion/", pastQuestionsFront.PastQuestions)
 	mux.HandleFunc("/questionBoards/", questionBoardsFront.QuestionBoards)
+	mux.HandleFunc("/questionBoardsReply/", questionBoardsFront.QuestionBoards)
+
 	
 	server := &http.Server{
 		Addr: "192.168.33.10:8080",

@@ -1,3 +1,4 @@
+START TRANSACTION;
 CREATE TABLE students(
     studentId CHAR(6) NOT NULL,
     name VARCHAR(20) NOT NULL,
@@ -6,14 +7,12 @@ CREATE TABLE students(
 
     PRIMARY KEY (studentId)
 );
-
 CREATE TABLE classes(
     classId CHAR(7) NOT NULL,
     className VARCHAR(30) NOT NULL,
 
     PRIMARY KEY (classId)
 );
-
 CREATE TABLE comments(
     classId CHAR(7) NOT NULL,
     commentId INT UNSIGNED NOT NULL,
@@ -27,7 +26,6 @@ CREATE TABLE comments(
     FOREIGN KEY (classId) REFERENCES classes(classId),
     FOREIGN KEY (studentId) REFERENCES students(studentId)
 );
-
 CREATE TABLE commentReplies (
     classId CHAR(7) NOT NULL,
     commentId INT UNSIGNED NOT NULL,
@@ -43,7 +41,6 @@ CREATE TABLE commentReplies (
     FOREIGN KEY (classId, commentId) REFERENCES comments(classId, commentId),
     FOREIGN KEY (studentId) REFERENCES students(studentId)
 );
-
 CREATE TABLE pastQuestions(
     classId CHAR(7) NOT NULL,
     year INT UNSIGNED NOT NULL,
@@ -56,7 +53,6 @@ CREATE TABLE pastQuestions(
     FOREIGN KEY (classId) REFERENCES classes(classId),
     CHECK (semester BETWEEN 1 AND 4)
 );
-
 CREATE TABLE questionBoards(
     classId CHAR(7) NOT NULL,
     year INT UNSIGNED NOT NULL,
@@ -68,13 +64,12 @@ CREATE TABLE questionBoards(
     PRIMARY KEY (classId, year, questionBoardId),
     FOREIGN KEY (classId) REFERENCES classes(classId)
 );
-
 CREATE TABLE questionBoardReplies(
     classId CHAR(7) NOT NULL,
     year INT UNSIGNED NOT NULL,
     questionBoardId INT NOT NULL,
     questionBoardReplyId INT UNSIGNED NOT NULL,
-    studentId CHAR(5) NOT NULL,
+    studentId CHAR(6) NOT NULL,
     reply text NOT NULL,
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
 
@@ -82,17 +77,19 @@ CREATE TABLE questionBoardReplies(
     FOREIGN KEY (classId) REFERENCES classes(classId),
     FOREIGN KEY (studentId) REFERENCES students(studentId)
 );
-
 INSERT INTO students (studentId, name, password) VALUES ("19T325", "fumiya", "password");
 INSERT INTO students (studentId, name, password) VALUES ("19T326", "yamada", "password");
 INSERT INTO students (studentId, name, password) VALUES ("19T327", "john", "password");
-
 INSERT INTO classes (classId, className) VALUES ("5005040", "情報数学");
-INSERT INTO classes (classId, className) VALUES ("5005070", "データ構造とアルゴリズム");
-
+INSERT INTO classes (classId, className) VALUES ("5005071", "データ構造とアルゴリズム");
+INSERT INTO classes (classId, className) VALUES ("5005072", "架空授業１");
+INSERT INTO classes (classId, className) VALUES ("5005073", "架空授業２");
+INSERT INTO classes (classId, className) VALUES ("5005074", "架空授業３");
 INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070", 1, "hello", "19T325");
 INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005070", 2, "hello WORLD", "19T326");
-
-
-SELECT CASE WHEN commentId IS NULL THEN 0 ELSE commentId END commentId FROM comments WHERE classId="5005070" ORDER BY commentId DESC LIMIT 1
-
+INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005071", 1, "hello WORLD", "19T326");
+INSERT INTO comments (classId, commentId, comment, studentId) VALUES ("5005071", 2, "hello WORLD foo", "19T327");
+INSERT INTO questionBoards (classId, year, questionBoardId, studentId, question) VALUES ("5005070", 2021, 1, "19T325", "this is first question");
+INSERT INTO questionBoards (classId, year, questionBoardId, studentId, question) VALUES ("5005070", 2021, 2, "19T326", "this is second question");
+INSERT INTO questionBoards (classId, year, questionBoardId, studentId, question) VALUES ("5005071", 2021, 1, "19T325", "this is first question");
+COMMIT;

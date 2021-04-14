@@ -2,7 +2,7 @@ package questionBoardsObj
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	// "fmt"
+	"fmt"
 	"database/sql"
 )
 
@@ -17,6 +17,15 @@ type QuestionBoard struct {
 	QuestionBoardId int `json: "questionBoardId"`
 	StudentId string `json:"studentId"`
 	Question string `json:"question"`
+	QuestoinBoardReply []QuestoinBoardReply `json:"questionBoardReply"`
+}
+
+type QuestoinBoardReply struct {
+	ClassId string `json:"classId"`
+	QuestionBoardId int `json:"questionBoardId"`
+	QuestionBoardReplyId int `json:"questionBoardReplyId"`
+	StudentId string `json:"studentId"`
+	Reply string `json:"reply"`
 }
 
 var db *sql.DB
@@ -107,8 +116,79 @@ func (questionBoard *QuestionBoard)GetQuestionBoard() (resultQuestionBoard []Que
 	for rows.Next() {
 		tmpQuestionBoard := new(QuestionBoard)
 		err = rows.Scan(&tmpQuestionBoard.ClassId, &tmpQuestionBoard.Year, &tmpQuestionBoard.QuestionBoardId, &tmpQuestionBoard.StudentId, &tmpQuestionBoard.Question)
+		statement = `SELECT classId, questionBoardReplyId, studentId, reply
+						FROM questionBoardReplies
+						WHERE classId=?
+						ORDER BY questionBoardReplyId`
+		stmt, err := db.Prepare(statement)
+		defer stmt.Close()
+		if err != nil {
+			return
+		}
+		replyRows, err := stmt.Query(tmpQuestionBoard.ClassId)
+		for replyRows.Next() {
+			tmpQuestionBoardReply := new(QuestoinBoardReply)
+			err = replyRows.Scan(&tmpQuestionBoardReply.ClassId, &tmpQuestionBoardReply.QuestionBoardReplyId, &tmpQuestionBoardReply.StudentId, &tmpQuestionBoardReply.Reply)
+			if err != nil {
+				return
+			}
+			tmpQuestionBoard.QuestoinBoardReply = append(tmpQuestionBoard.QuestoinBoardReply, *tmpQuestionBoardReply)
+		}
 		resultQuestionBoard = append(resultQuestionBoard, *tmpQuestionBoard)
 	}
 	result = true
+	return
+}
+
+func (questionBoardReply *QuestoinBoardReply)AddQuestionBoardReply()(result bool) {
+	statement := `SELECT COUNT(*)
+					FROM questionBoards
+					WHERE classId=?`
+	var num int
+	
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		return
+	}
+	err = stmt.QueryRow(questionBoardReply.ClassId).Scan(&num)
+	if num != 0 {
+		var nextQuestionBoardReplyId int
+		statement = `SELECT CASE
+						WHEN COUNT(*)=0 THEN 1
+						ELSE (
+							SELECT questionBoardReplyId+1
+							FROM questionBoardReplies
+							WHERE classId=?
+							ORDER BY questionBoardReplyId DESC LIMIT 1
+						) END
+					FROM questionBoardReplies
+					WHERE classId=?`
+		stmt, err = db.Prepare(statement)
+		defer stmt.Close()
+		if err != nil {
+			return
+		}
+		err = stmt.QueryRow(questionBoardReply.ClassId, questionBoardReply.ClassId).Scan(&nextQuestionBoardReplyId)
+		if err != nil {
+			return
+		}
+		statement = `INSERT INTO questionBoardReplies
+					(classId, year, questionBoardId, questionBoardReplyId, studentId, reply)
+					VALUES (?, 2020, ?, ?, ?, ?)`
+		stmt, err = db.Prepare(statement)
+		defer stmt.Close()
+		if err!= nil {
+			return
+		}
+		_, err = stmt.Exec(questionBoardReply.ClassId, questionBoardReply.QuestionBoardId, questionBoardReply.QuestionBoardReplyId, questionBoardReply.StudentId, questionBoardReply.Reply)
+		if err != nil {
+			fmt.Printf("%v\n", err)
+			return
+		}
+		fmt.Printf("ここまでおｋ\n")
+		result = true
+		return
+	}
 	return
 }
