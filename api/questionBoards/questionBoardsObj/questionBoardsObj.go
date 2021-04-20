@@ -2,7 +2,7 @@ package questionBoardsObj
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"fmt"
+	// "fmt"
 	"database/sql"
 )
 
@@ -183,10 +183,8 @@ func (questionBoardReply *QuestoinBoardReply)AddQuestionBoardReply()(result bool
 		}
 		_, err = stmt.Exec(questionBoardReply.ClassId, questionBoardReply.QuestionBoardId, questionBoardReply.QuestionBoardReplyId, questionBoardReply.StudentId, questionBoardReply.Reply)
 		if err != nil {
-			fmt.Printf("%v\n", err)
 			return
 		}
-		fmt.Printf("ここまでおｋ\n")
 		result = true
 		return
 	}
