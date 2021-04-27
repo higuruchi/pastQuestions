@@ -2,8 +2,10 @@ package studentsObj
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
+
 	// "golang.org/x/crypto/bcrypt"
 	// "crypto/md5"
 	// "io"
@@ -12,25 +14,25 @@ import (
 
 type Student struct {
 	StudentId string `json:"studentId"`
-	Name string `json:"name"`
+	Name      string `json:"name"`
 }
 
 type Result struct {
-	Result bool `json:"result"`
-	Body []Student `json:"body"`
+	Result bool      `json:"result"`
+	Body   []Student `json:"body"`
 }
 
 var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:Fumiya_0324@/pastQuestions")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
-	}		
+	}
 }
 
-func (student *Student)AddStudent(password string) (result bool) {
+func (student *Student) AddStudent(password string) (result bool) {
 	num := 0
 	result = false
 	statement := `SELECT COUNT(*) FROM students WHERE studentId=?`
@@ -50,7 +52,7 @@ func (student *Student)AddStudent(password string) (result bool) {
 			return
 		}
 		_, err = stmt.Exec(student.StudentId, student.Name, password)
-		if err !=nil {
+		if err != nil {
 			return
 		}
 		result = true
@@ -58,7 +60,7 @@ func (student *Student)AddStudent(password string) (result bool) {
 	return
 }
 
-func (student *Student)DeleteStudent() (result bool) {
+func (student *Student) DeleteStudent() (result bool) {
 	result = false
 	num := 0
 
@@ -87,7 +89,7 @@ func (student *Student)DeleteStudent() (result bool) {
 	return
 }
 
-func (student *Student)ModifyStudent(key string, val string, password string) (result bool) {
+func (student *Student) ModifyStudent(key string, val string, password string) (result bool) {
 	result = false
 	num := 0
 	password = common.EncriptPassword(password)
@@ -104,12 +106,12 @@ func (student *Student)ModifyStudent(key string, val string, password string) (r
 	}
 	if num != 0 {
 		switch key {
-			case "eMail":
-				statement = `UPDATE students SET eMail=? WHERE studentId=?`
-			case "name":
-				statement = `UPDATE students SET name=? WHERE studentId=?`
-			case "password":
-				statement = `UPDATE students SET password=? WHERE studentId=?`
+		case "eMail":
+			statement = `UPDATE students SET eMail=? WHERE studentId=?`
+		case "name":
+			statement = `UPDATE students SET name=? WHERE studentId=?`
+		case "password":
+			statement = `UPDATE students SET password=? WHERE studentId=?`
 		}
 		stmt, err = db.Prepare(statement)
 		if err != nil {
@@ -125,7 +127,7 @@ func (student *Student)ModifyStudent(key string, val string, password string) (r
 
 }
 
-func (result *Result)ShowStudnet(studentId string) {
+func (result *Result) ShowStudnet(studentId string) {
 	student := new(Student)
 
 	statement := `SELECT studentId, name FROM students WHERE studentId=?`

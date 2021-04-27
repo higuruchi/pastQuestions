@@ -1,14 +1,15 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
-	"./api/classes"
-	"./api/students"
-	"./api/comments"
-	"./api/pastQuestions"
-	"./api/loginLogout"
-	"./api/questionBoards"
+	"net/http"
+
+	classesFront "./api/classes"
+	commentsFront "./api/comments"
+	loginLogoutFront "./api/loginLogout"
+	pastQuestionsFront "./api/pastQuestions"
+	questionBoardsFront "./api/questionBoards"
+	studentsFront "./api/students"
 	// "github.com/gorilla/sessions"
 )
 
@@ -17,9 +18,11 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-	
+
 	files := http.FileServer(http.Dir("./public"))
+	pastQuestionFiles := http.FileServer(http.Dir("./pastQuestions"))
 	mux.Handle("/static/", http.StripPrefix("/static/", files))
+	mux.Handle("/pastQuestions/", http.StripPrefix("/pastQuestions/", pastQuestionFiles))
 	mux.HandleFunc("/students/", studentsFront.Students)
 	mux.HandleFunc("/classes/", classesFront.Classes)
 	mux.HandleFunc("/comments/main/", commentsFront.Comments)
@@ -29,9 +32,8 @@ func main() {
 	mux.HandleFunc("/questionBoards/", questionBoardsFront.QuestionBoards)
 	mux.HandleFunc("/questionBoardsReply/", questionBoardsFront.QuestionBoards)
 
-	
 	server := &http.Server{
-		Addr: "192.168.33.10:8080",
+		Addr:    "172.28.0.3:8080",
 		Handler: mux,
 	}
 	fmt.Println("8080番ポートにて過去問データベースが稼働しています")

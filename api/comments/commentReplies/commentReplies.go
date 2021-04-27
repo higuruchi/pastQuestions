@@ -1,41 +1,40 @@
 package commentReplies
 
 import (
-	_ "github.com/go-sql-driver/mysql"
-	"fmt"
 	"database/sql"
+	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type CommentReply struct {
-	ClassId string `json:"classId"`
-	CommentId int `json:"commentId"`
-	CommentReplyId int `json:"commentReplyId"`
-	StudentId string `json:"studentId"`
-	Comment string `json:"comment"`
-	GoodFlg bool `json:"goodFlg"`
-	BadFlg bool `json:"badFlg"`
-	Good int `json:"good"`
-	Bad int `json:"bad"`
+	ClassId        string `json:"classId"`
+	CommentId      int    `json:"commentId"`
+	CommentReplyId int    `json:"commentReplyId"`
+	StudentId      string `json:"studentId"`
+	Comment        string `json:"comment"`
+	GoodFlg        bool   `json:"goodFlg"`
+	BadFlg         bool   `json:"badFlg"`
+	Good           int    `json:"good"`
+	Bad            int    `json:"bad"`
 }
 
 type Result struct {
-	Result bool `json:"result"`
-	Body []CommentReply `json:"body"`
+	Result bool           `json:"result"`
+	Body   []CommentReply `json:"body"`
 }
 
 var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:Fumiya_0324@/pastQuestions")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
 }
 
-
-
-func (commentReply *CommentReply)AddReplyComments() (result bool) {
+func (commentReply *CommentReply) AddReplyComments() (result bool) {
 	num := 0
 	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
 						ELSE (SELECT commentReplyId

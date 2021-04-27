@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+        pastQuestionServer:
+                image: ubuntu
+                networks: 
+                        - pastQuestionNetwork
+                depends_on: 
+                        - pastQuestionDb
+                restart: always
+                container_name: pastQuestionServer
+                volumes: 
+                        - /home/higuruchi/App/Golang/pastQuestions:/home
+                tty: true
+        pastQuestionDb:
+                image: mysql
+                networks: 
+                        - pastQuestionNetwork
+                volumes:
+                        - pastQuestionVolume:/var/lib/mysql
+                restart: always
+                container_name: pastQuestionDb
+                environment:
+                        MYSQL_ROOT_PASSWORD: F_2324@a
+                        MYSQL_DATABASE: pastQuestion
+
+networks:
+        pastQuestionNetwork:
+volumes: 
+        pastQuestionVolume:

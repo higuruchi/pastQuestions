@@ -43,30 +43,3 @@ POST /comments/reply/
     <commentId name="commentId">
     </form>
 
-
-
-
-UPDATE comments
-SET good = (
-    SELECT good
-    FROM (
-        SELECT (CASE 
-                WHEN good = 0 THEN 0
-                WHEN good > 0 THEN good - 1
-                ELSE good END) AS good 
-        FROM comments
-        WHERE classId=5005040 AND commentId=1
-    ) TMP
-)
-WHERE classId=5005040 AND commentId=1
-
-
-SELECT CASE
-    WHEN COUNT(*)=0 THEN "nothnig"
-    ELSE (
-        SELECT fileName
-        FROM pastQuestions
-        WHERE classId="5005040" AND year=2020 AND semester=1
-        ORDER BY fileId DESC LIMIT 1) END AS fileName
-FROM pastQuestions
-WHERE classId="5005040" AND year=2020 AND semester=1

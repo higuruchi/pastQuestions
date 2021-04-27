@@ -93,7 +93,3 @@ INSERT INTO questionBoards (classId, year, questionBoardId, studentId, question)
 INSERT INTO questionBoards (classId, year, questionBoardId, studentId, question) VALUES ("5005070", 2021, 2, "19T326", "this is second question");
 INSERT INTO questionBoards (classId, year, questionBoardId, studentId, question) VALUES ("5005071", 2021, 1, "19T325", "this is first question");
 COMMIT;
-
-
-5:20.10.6~3-0~ubuntu-focal
-sudo apt-get install docker-ce=5:20.10.6~3-0~ubuntu-focal docker-ce-cli=5:20.10.6~3-0~ubuntu-focal containerd.io

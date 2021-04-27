@@ -7,39 +7,38 @@ import (
 )
 
 type Result struct {
-	Result bool `json:"result"`
-	Body []QuestionBoard `json:"body"`
+	Result bool            `json:"result"`
+	Body   []QuestionBoard `json:"body"`
 }
 
 type QuestionBoard struct {
-	ClassId string `json:"classId"`
-	Year int `json:"year"`
-	QuestionBoardId int `json: "questionBoardId"`
-	StudentId string `json:"studentId"`
-	Question string `json:"question"`
+	ClassId            string               `json:"classId"`
+	Year               int                  `json:"year"`
+	QuestionBoardId    int                  `json: "questionBoardId"`
+	StudentId          string               `json:"studentId"`
+	Question           string               `json:"question"`
 	QuestoinBoardReply []QuestoinBoardReply `json:"questionBoardReply"`
 }
 
 type QuestoinBoardReply struct {
-	ClassId string `json:"classId"`
-	QuestionBoardId int `json:"questionBoardId"`
-	QuestionBoardReplyId int `json:"questionBoardReplyId"`
-	StudentId string `json:"studentId"`
-	Reply string `json:"reply"`
+	ClassId              string `json:"classId"`
+	QuestionBoardId      int    `json:"questionBoardId"`
+	QuestionBoardReplyId int    `json:"questionBoardReplyId"`
+	StudentId            string `json:"studentId"`
+	Reply                string `json:"reply"`
 }
 
 var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:Fumiya_0324@/pastQuestions")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
-	}		
+	}
 }
 
-
-func (questionBoard *QuestionBoard)AddQuestionBoard() (result bool) {
+func (questionBoard *QuestionBoard) AddQuestionBoard() (result bool) {
 	var num int
 
 	statement := `SELECT CASE
@@ -54,12 +53,12 @@ func (questionBoard *QuestionBoard)AddQuestionBoard() (result bool) {
 	}
 
 	err = stmt.QueryRow(questionBoard.ClassId).Scan(&num)
-	if err!= nil {
+	if err != nil {
 		return
 	}
 
 	if num == 1 {
-		
+
 		statement = `SELECT CASE
 						WHEN COUNT(*)=0 THEN 1
 						ELSE (
@@ -80,7 +79,6 @@ func (questionBoard *QuestionBoard)AddQuestionBoard() (result bool) {
 			return
 		}
 
-
 		statement = `INSERT INTO questionBoards (classId, questionBoardId, studentId, question, year)
 					VALUES (?, ?, ?, ?, 2020)`
 		stmt, err = db.Prepare(statement)
@@ -98,7 +96,7 @@ func (questionBoard *QuestionBoard)AddQuestionBoard() (result bool) {
 	return
 }
 
-func (questionBoard *QuestionBoard)GetQuestionBoard() (resultQuestionBoard []QuestionBoard, result bool) {
+func (questionBoard *QuestionBoard) GetQuestionBoard() (resultQuestionBoard []QuestionBoard, result bool) {
 	statement := `SELECT classId, year, questionBoardId, studentId, question
 					FROM questionBoards
 					WHERE classId=?
@@ -110,7 +108,7 @@ func (questionBoard *QuestionBoard)GetQuestionBoard() (resultQuestionBoard []Que
 	}
 
 	rows, errs := stmt.Query(questionBoard.ClassId)
-	if errs!= nil {
+	if errs != nil {
 		return
 	}
 	for rows.Next() {
@@ -140,12 +138,12 @@ func (questionBoard *QuestionBoard)GetQuestionBoard() (resultQuestionBoard []Que
 	return
 }
 
-func (questionBoardReply *QuestoinBoardReply)AddQuestionBoardReply()(result bool) {
+func (questionBoardReply *QuestoinBoardReply) AddQuestionBoardReply() (result bool) {
 	statement := `SELECT COUNT(*)
 					FROM questionBoards
 					WHERE classId=?`
 	var num int
-	
+
 	stmt, err := db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
@@ -178,7 +176,7 @@ func (questionBoardReply *QuestoinBoardReply)AddQuestionBoardReply()(result bool
 					VALUES (?, 2020, ?, ?, ?, ?)`
 		stmt, err = db.Prepare(statement)
 		defer stmt.Close()
-		if err!= nil {
+		if err != nil {
 			return
 		}
 		_, err = stmt.Exec(questionBoardReply.ClassId, questionBoardReply.QuestionBoardId, questionBoardReply.QuestionBoardReplyId, questionBoardReply.StudentId, questionBoardReply.Reply)

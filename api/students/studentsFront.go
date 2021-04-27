@@ -94,17 +94,18 @@ func Students(w http.ResponseWriter, r *http.Request) {
 				result.Result = false
 				json, _ := json.Marshal(result)
 				w.Write(json)
+			} else {
+				// for key, val := range query {
+				// 	condition[key] = val[0]
+				// }
+	
+				// 失敗した場合のエラー処理のことなどは後回しにする
+				result.ShowStudnet(studentId)
+				result.Result = true
+				json, _ := json.Marshal(result)
+				w.Write(json)
 			}
 			
-			// for key, val := range query {
-			// 	condition[key] = val[0]
-			// }
-
-			// 失敗した場合のエラー処理のことなどは後回しにする
-			result.ShowStudnet(studentId)
-			result.Result = true
-			json, _ := json.Marshal(result)
-			w.Write(json)
 
 	}
 }

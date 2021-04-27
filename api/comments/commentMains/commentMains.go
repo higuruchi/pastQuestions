@@ -2,36 +2,36 @@ package commentMains
 
 import (
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type Comment struct {
-	ClassId string `json:"classId"`
-	CommentId int `json:"commentId"`
-	Comment string `json:"comment"`
+	ClassId   string `json:"classId"`
+	CommentId int    `json:"commentId"`
+	Comment   string `json:"comment"`
 	StudentId string `json:"studentId`
-	GoodFlg bool `json:"goodflg"`
-	BadFlg bool `json:"badflg"`
-	Good int `json:"good"`
-	Bad int `json:"bad"`
+	GoodFlg   bool   `json:"goodflg"`
+	BadFlg    bool   `json:"badflg"`
+	Good      int    `json:"good"`
+	Bad       int    `json:"bad"`
 }
 type Result struct {
-	Result bool `json:"result"`
-	Body []Comment `json:"body"`
+	Result bool      `json:"result"`
+	Body   []Comment `json:"body"`
 }
 
 var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:Fumiya_0324@/pastQuestions")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
 }
 
-
-func (comment *Comment)AddComment()(result bool) {
+func (comment *Comment) AddComment() (result bool) {
 	num := 0
 	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
 						ELSE (SELECT commentId
@@ -71,7 +71,7 @@ func (comment *Comment)AddComment()(result bool) {
 	return
 }
 
-func (comment *Comment)GetComment()(comments []Comment, result bool) {
+func (comment *Comment) GetComment() (comments []Comment, result bool) {
 	statement := `SELECT classId, commentId, comment, studentId, good, bad FROM comments
 					WHERE classId=? AND commentId>=?`
 	stmt, err := db.Prepare(statement)
@@ -94,7 +94,7 @@ func (comment *Comment)GetComment()(comments []Comment, result bool) {
 	return
 }
 
-func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool) {
+func (comment *Comment) GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool) {
 	num := 0
 
 	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
@@ -129,7 +129,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
-			if err!= nil {
+			if err != nil {
 				return
 			}
 			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
@@ -139,7 +139,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 			result = true
 			return
 
-		// reduceの場合
+			// reduceの場合
 		} else {
 			// good--
 			// if good < 0 {
@@ -160,7 +160,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
-			if err!= nil {
+			if err != nil {
 				return
 			}
 			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
@@ -171,7 +171,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 			return
 		}
 
-	// badの場合
+		// badの場合
 	} else {
 
 		// addの場合
@@ -188,7 +188,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
-			if err!= nil {
+			if err != nil {
 				return
 			}
 			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)
@@ -199,7 +199,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 			result = true
 			return
 
-		// reduceの場合
+			// reduceの場合
 		} else {
 			statement = `UPDATE comments
 						SET bad = (
@@ -216,7 +216,7 @@ func (comment *Comment)GoodAndBad(goodOrBad bool, addOrReduce bool) (result bool
 						WHERE classId=? AND commentId=?`
 			stmt, err = db.Prepare(statement)
 			defer stmt.Close()
-			if err!= nil {
+			if err != nil {
 				return
 			}
 			_, err = stmt.Exec(comment.ClassId, comment.CommentId, comment.ClassId, comment.CommentId)

@@ -2,33 +2,32 @@ package classesObj
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Class struct {
-	ClassId string `json:"classId"`
+	ClassId   string `json:"classId"`
 	ClassName string `json:"className"`
 }
 
 type Result struct {
-	Result bool `json:"result"`
-	Body []Class `json:"body"`
+	Result bool    `json:"result"`
+	Body   []Class `json:"body"`
 }
 
 var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:Fumiya_0324@/pastQuestions")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
 }
 
-
-
-func (class *Class)AddClass()(result bool) {
+func (class *Class) AddClass() (result bool) {
 	num := 0
 	statement := `SELECT COUNT(*) FROM classes WHERE classId=?`
 	stmt, err := db.Prepare(statement)
@@ -59,7 +58,7 @@ func (class *Class)AddClass()(result bool) {
 	return
 }
 
-func (class *Class)ModifyClass()(result bool) {
+func (class *Class) ModifyClass() (result bool) {
 	num := 0
 	statement := "SELECT COUNT(*) FROM classes WHERE classId=?"
 	stmt, err := db.Prepare(statement)
@@ -97,7 +96,7 @@ func (class *Class)ModifyClass()(result bool) {
 	return
 }
 
-func (class *Class)DeleteClass()(result bool){
+func (class *Class) DeleteClass() (result bool) {
 	num := 0
 	statement := "SELECT COUNT(*) FROM classes WHERE classId=?"
 	stmt, err := db.Prepare(statement)
@@ -126,7 +125,7 @@ func (class *Class)DeleteClass()(result bool){
 			result = false
 			return
 		}
-		result = true 
+		result = true
 		return
 	}
 	result = false
