@@ -2,7 +2,6 @@ package commentReplies
 
 import (
 	"database/sql"
-	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -61,11 +60,29 @@ func (commentReply *CommentReply) AddReplyComments() (result bool) {
 	}
 	_, err = stmt.Exec(commentReply.ClassId, commentReply.CommentId, num, commentReply.Comment, commentReply.StudentId)
 	if err != nil {
-		fmt.Printf("%v\n", err)
 		result = false
 		return
 	}
 	commentReply.CommentReplyId = num
 	result = true
+	return
+}
+
+func GetCommentReplies(classId string, commentId int) (commentReplies []CommentReply, ok bool) {
+	statement := `SELECT classId, commentId, commentReplyId, comment, studentId, studentId, good, bad
+					FROM commentReplies
+					WHERE classId=? AND commentId=?`
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		return
+	}
+	rows, _ := stmt.Query(classId, commentId)
+	for rows.Next() {
+		commentReply := new(CommentReply)
+		rows.Scan(commentReply.ClassId, commentReply.CommentId, commentReply.Comment, commentReply.StudentId, commentReply.Good, commentReply.Bad)
+		commentReplies = append(commentReplies, *commentReply)
+	}
+	ok = true
 	return
 }

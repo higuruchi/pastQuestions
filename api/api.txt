@@ -5,8 +5,8 @@ POST /students/
     <name name="name">
     <password password="password">
     </form>
-DELETE /students/<studentId>
-PUT /students/<studentId>/<key(coloum)>
+DELETE /students/<studentId>/
+PUT /students/<studentId>/<key(coloum)>/
     <form>
     <password name="password">
     <val name=key>

@@ -8,6 +8,7 @@ import (
 	commentsFront "./api/comments"
 	loginLogoutFront "./api/loginLogout"
 	pastQuestionsFront "./api/pastQuestions"
+	questionBoardRepliesFront "./api/questionBoardReplies"
 	questionBoardsFront "./api/questionBoards"
 	studentsFront "./api/students"
 	// "github.com/gorilla/sessions"
@@ -31,6 +32,7 @@ func main() {
 	mux.HandleFunc("/pastQuestion/", pastQuestionsFront.PastQuestions)
 	mux.HandleFunc("/questionBoards/", questionBoardsFront.QuestionBoards)
 	mux.HandleFunc("/questionBoardsReply/", questionBoardsFront.QuestionBoards)
+	mux.HandleFunc("/questionBoardRepliesFront/", questionBoardRepliesFront.QuestionBoardReplies)
 
 	server := &http.Server{
 		Addr:    "172.28.0.3:8080",
@@ -39,5 +41,3 @@ func main() {
 	fmt.Println("8080番ポートにて過去問データベースが稼働しています")
 	server.ListenAndServe()
 }
-
-// push test second
