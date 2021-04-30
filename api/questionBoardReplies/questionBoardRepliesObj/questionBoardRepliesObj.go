@@ -68,7 +68,7 @@ func (questionBoardReply *QuestionBoardReply) AddQuestionBoardReply() (result bo
 	return
 }
 
-func GetQuestionBoardReply(classId int, questionBoardId int) (questionBoardReplies []QuestionBoardReply, ok bool) {
+func GetQuestionBoardReply(classId string, questionBoardId int) (questionBoardReplies []QuestionBoardReply, ok bool) {
 	statement := `SELECT classId, questionBoardId, questionBoardReplyId, studentId, reply
 					FROM questionBoardReplies
 					WHERE claddId=? AND questionBoardId=?`

@@ -132,6 +132,25 @@ func (class *Class) DeleteClass() (result bool) {
 	return
 }
 
-// func (class *Class)GetClass()(classes []Class) {
+func GetClass(className string) (classes []Class, ok bool) {
+	statement := `SELECT classId, className
+					FROM classes
+					WHERE className=?`
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		return
+	}
 
-// }
+	rows, _ := stmt.Query(className)
+	for rows.Next() {
+		class := new(Class)
+		err = rows.Scan(&class.ClassId, &class.ClassName)
+		if err != nil {
+			return
+		}
+		classes = append(classes, *class)
+	}
+	ok = true
+	return
+}

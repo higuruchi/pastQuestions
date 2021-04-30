@@ -66,7 +66,7 @@ func QuestionBoardReplies(w http.ResponseWriter, r *http.Request) {
 		if err != nil || flg {
 			return
 		}
-		result.Body = questionBoardRepliesObj.GetQuestionBoardReply(classId, questionBoardId)
+		result.Body, flg = questionBoardRepliesObj.GetQuestionBoardReply(classId, questionBoardId)
 		result.Result = true
 		return
 	}
