@@ -27,7 +27,7 @@ var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.3:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
@@ -35,8 +35,8 @@ func init() {
 
 func (commentReply *CommentReply) AddReplyComments() (result bool) {
 	num := 0
-	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 0
-						ELSE (SELECT commentReplyId
+	statement := `SELECT CASE WHEN COUNT(*) = 0 THEN 1
+						ELSE (SELECT commentReplyId+1
 								FROM commentReplies
 								WHERE classId=? AND commentId=?
 								ORDER BY commentReplyId DESC LIMIT 1) END AS commentIdNum
@@ -49,7 +49,6 @@ func (commentReply *CommentReply) AddReplyComments() (result bool) {
 		return
 	}
 	err = stmt.QueryRow(commentReply.ClassId, commentReply.CommentId, commentReply.ClassId).Scan(&num)
-	num++
 
 	statement = `INSERT INTO commentReplies (classId, commentId, commentReplyId, comment, studentId) VALUES (?, ?, ?, ?, ?)`
 	stmt, err = db.Prepare(statement)
@@ -69,7 +68,7 @@ func (commentReply *CommentReply) AddReplyComments() (result bool) {
 }
 
 func GetCommentReplies(classId string, commentId int) (commentReplies []CommentReply, ok bool) {
-	statement := `SELECT classId, commentId, commentReplyId, comment, studentId, studentId, good, bad
+	statement := `SELECT classId, commentId, commentReplyId, comment, studentId, good, bad
 					FROM commentReplies
 					WHERE classId=? AND commentId=?`
 	stmt, err := db.Prepare(statement)
@@ -80,7 +79,7 @@ func GetCommentReplies(classId string, commentId int) (commentReplies []CommentR
 	rows, _ := stmt.Query(classId, commentId)
 	for rows.Next() {
 		commentReply := new(CommentReply)
-		rows.Scan(commentReply.ClassId, commentReply.CommentId, commentReply.Comment, commentReply.StudentId, commentReply.Good, commentReply.Bad)
+		rows.Scan(&commentReply.ClassId, &commentReply.CommentId, &commentReply.CommentReplyId, &commentReply.Comment, &commentReply.StudentId, &commentReply.Good, &commentReply.Bad)
 		commentReplies = append(commentReplies, *commentReply)
 	}
 	ok = true

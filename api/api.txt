@@ -32,7 +32,7 @@ POST /comments/main/
     <classId name="classId">
     <comment name="comment">
     </form>
-GET /comments/main/?classId=<classId>&commentId=<commentId>
+GET /comments/main/?classId=<classId>
 PUT /comments/main/<good or bad>/<add or reduce>/<classId>/<commentId>
 
 POST /comments/reply/

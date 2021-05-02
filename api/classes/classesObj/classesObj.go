@@ -21,7 +21,7 @@ var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.3:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
@@ -143,6 +143,31 @@ func GetClass(className string) (classes []Class, ok bool) {
 	}
 
 	rows, _ := stmt.Query(className)
+	for rows.Next() {
+		class := new(Class)
+		err = rows.Scan(&class.ClassId, &class.ClassName)
+		if err != nil {
+			return
+		}
+		classes = append(classes, *class)
+	}
+	ok = true
+	return
+}
+
+func GetHomeClass() (classes []Class, ok bool) {
+
+	statement := `SELECT classId, className
+					FROM classes
+					ORDER BY classId
+					LIMIT 10`
+	stmt, err := db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
+		fmt.Printf("%v\n\n\n\n", err)
+		return
+	}
+	rows, _ := stmt.Query()
 	for rows.Next() {
 		class := new(Class)
 		err = rows.Scan(&class.ClassId, &class.ClassName)

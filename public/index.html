@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <title>過去問データベース</title>
     <link rel="stylesheet" href="style.css?1">
+    <script type="module" src="index.js?"></script>
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+    <!-- <script type="module" src="./lib/home.js"></script> -->
+
 </head>
 <body>
+    <hidden id="studentId">19T325</hidden>
     <input id="menu" type="checkbox">
     <label for="menu" class="back"></label>
     <div class="navIconWrap open">
@@ -15,26 +20,25 @@
             <span></span>
         </label>
     </div>
-    <aside>
+    <aside id="aside">
         <nav>
             <ul>
-                <li>ホーム</li>
-                <li>質問掲示板</li>
-                <li>ユーザ情報</li>
+                <li class="home">ホーム</li>
+                <li class="questionBoard">質問掲示板</li>
+                <li class="student">ユーザ情報</li>
             </ul>
         </nav>
         <div class="sideFooter">
             side footer
         </div>
     </aside>
-    <header>
+    <header id="header">
         <div class="search">
             <input type="text">
             <button>検索</button>
         </div>
     </header>
-    <main>
-        Main
+    <main id="main">
     </main>
 </body>
 </html>

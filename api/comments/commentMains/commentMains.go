@@ -10,7 +10,7 @@ type Comment struct {
 	ClassId   string `json:"classId"`
 	CommentId int    `json:"commentId"`
 	Comment   string `json:"comment"`
-	StudentId string `json:"studentId`
+	StudentId string `json:"studentId"`
 	GoodFlg   bool   `json:"goodflg"`
 	BadFlg    bool   `json:"badflg"`
 	Good      int    `json:"good"`
@@ -25,7 +25,7 @@ var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.3:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,7 @@ func (comment *Comment) AddComment() (result bool) {
 	return
 }
 
-func (comment *Comment) GetComment() (comments []Comment, result bool) {
+func GetComment(classId string, commentId int) (comments []Comment, result bool) {
 	statement := `SELECT classId, commentId, comment, studentId, good, bad FROM comments
 					WHERE classId=? AND commentId>=?`
 	stmt, err := db.Prepare(statement)
@@ -81,7 +81,7 @@ func (comment *Comment) GetComment() (comments []Comment, result bool) {
 		return
 	}
 
-	rows, _ := stmt.Query(comment.ClassId, comment.CommentId)
+	rows, _ := stmt.Query(classId, commentId)
 	for rows.Next() {
 		resultComment := new(Comment)
 		if err := rows.Scan(&resultComment.ClassId, &resultComment.CommentId, &resultComment.Comment, &resultComment.StudentId, &resultComment.Good, &resultComment.Bad); err != nil {

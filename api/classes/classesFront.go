@@ -78,13 +78,21 @@ func Classes(w http.ResponseWriter, r *http.Request) {
 
 	case "GET":
 		result := new(classesObj.Result)
-		className, flg := common.CheckInput(r.FormValue("className"), `.*`)
+		className, flg := common.CheckInput(r.FormValue("className"), `.+`)
 
 		if flg {
-			w.WriteHeader(400)
+			if classes, ok := classesObj.GetHomeClass(); ok {
+				result.Body = classes
+				json, _ := json.Marshal(result)
+				w.Write(json)
+			} else {
+				w.WriteHeader(400)
+			}
 		} else {
 			if classes, ok := classesObj.GetClass(className); ok {
 				result.Body = classes
+				json, _ := json.Marshal(result)
+				w.Write(json)
 			} else {
 				w.WriteHeader(400)
 			}

@@ -30,7 +30,7 @@ var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.3:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
@@ -68,9 +68,9 @@ func (pastQuestion *PastQuestion) SavePastQuestion(file []byte) (result bool) {
 	}
 
 	statement := `SELECT CASE
-					WHEN COUNT(*)=0 THEN "nothing"
+					WHEN COUNT(*)=0 THEN 1
 					ELSE (
-					SELECT fileName
+					SELECT fileId+1
 					FROM pastQuestions
 					WHERE classId=? AND year=? AND semester=?
 					ORDER BY fileId DESC LIMIT 1) END AS fileName
@@ -84,7 +84,6 @@ func (pastQuestion *PastQuestion) SavePastQuestion(file []byte) (result bool) {
 	if err != nil {
 		return
 	}
-	newFileId++
 	statement = `INSERT INTO pastQuestions (classId, year, semester, fileId, fileName)
 				VALUES (?, ?, ?, ?, ?)`
 
