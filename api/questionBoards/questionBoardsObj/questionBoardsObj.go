@@ -1,6 +1,8 @@
 package questionBoardsObj
 
 import (
+	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 	// "fmt"
 	"database/sql"
@@ -18,6 +20,7 @@ type ResultRep struct {
 
 type QuestionBoard struct {
 	ClassId            string               `json:"classId"`
+	ClassName          string               `json:"className"`
 	Year               int                  `json:"year"`
 	QuestionBoardId    int                  `json:"questionBoardId"`
 	StudentId          string               `json:"studentId"`
@@ -27,6 +30,7 @@ type QuestionBoard struct {
 
 type QuestoinBoardReply struct {
 	ClassId              string `json:"classId"`
+	ClassName            string `json:"className"`
 	QuestionBoardId      int    `json:"questionBoardId"`
 	QuestionBoardReplyId int    `json:"questionBoardReplyId"`
 	StudentId            string `json:"studentId"`
@@ -43,67 +47,57 @@ func init() {
 	}
 }
 
-func (questionBoard *QuestionBoard) AddQuestionBoard() (result bool) {
-	var num int
+func AddQuestionBoard(classId string, year int, studentId string, question string) (result bool, questionBoard []QuestionBoard) {
+	var (
+		num              int
+		newQuestionBoard QuestionBoard
+	)
 
 	statement := `SELECT CASE
-					WHEN COUNT(*)=0 THEN 0
-					ELSE 1 END
-					FROM classes
-					WHERE classId=?`
+					WHEN COUNT(*)=0 THEN 1
+					ELSE (
+						SELECT questionBoardId+1
+						FROM questionBoards
+						WHERE classId=?
+						ORDER BY questionBoardId DESC LIMIT 1
+					) END
+				FROM questionBoards
+				WHERE classId=?`
 	stmt, err := db.Prepare(statement)
 	defer stmt.Close()
 	if err != nil {
 		return
 	}
-
-	err = stmt.QueryRow(questionBoard.ClassId).Scan(&num)
+	err = stmt.QueryRow(classId, classId).Scan(&num)
 	if err != nil {
 		return
 	}
 
-	if num == 1 {
-
-		statement = `SELECT CASE
-						WHEN COUNT(*)=0 THEN 1
-						ELSE (
-							SELECT questionBoardId+1
-							FROM questionBoards
-							WHERE classId=?
-							ORDER BY questionBoardId DESC LIMIT 1
-						) END
-					FROM questionBoards
-					WHERE classId=?`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err != nil {
-			return
-		}
-		err = stmt.QueryRow(questionBoard.ClassId, questionBoard.ClassId).Scan(&num)
-		if err != nil {
-			return
-		}
-
-		statement = `INSERT INTO questionBoards (classId, questionBoardId, studentId, question, year)
-					VALUES (?, ?, ?, ?, 2020)`
-		stmt, err = db.Prepare(statement)
-		defer stmt.Close()
-		if err != nil {
-			return
-		}
-		_, err = stmt.Exec(questionBoard.ClassId, num, questionBoard.StudentId, questionBoard.Question)
-		if err != nil {
-			return
-		}
-		result = true
+	statement = `INSERT INTO questionBoards (classId, questionBoardId, studentId, question, year)
+				VALUES (?, ?, ?, ?, ?)`
+	stmt, err = db.Prepare(statement)
+	defer stmt.Close()
+	if err != nil {
 		return
 	}
+	_, err = stmt.Exec(classId, num, studentId, question, year)
+	if err != nil {
+		fmt.Printf("%v\n%v\n", err, classId)
+		return
+	}
+	newQuestionBoard.ClassId = classId
+	newQuestionBoard.Year = year
+	newQuestionBoard.QuestionBoardId = num
+	newQuestionBoard.StudentId = studentId
+	newQuestionBoard.Question = question
+	questionBoard = append(questionBoard, newQuestionBoard)
+	result = true
 	return
 }
 
 func GetQuestionBoard() (resultQuestionBoard []QuestionBoard, result bool) {
-	statement := `SELECT classId, year, questionBoardId, studentId, question
-				FROM questionBoards
+	statement := `SELECT questionBoards.classId, questionBoards.year, questionBoards.questionBoardId, questionBoards.studentId, questionBoards.question, classes.className
+				FROM questionBoards INNER JOIN classes ON questionBoards.classId = classes.classId
 				ORDER BY questionBoardId
 				LIMIT 10`
 	stmt, err := db.Prepare(statement)
@@ -118,17 +112,17 @@ func GetQuestionBoard() (resultQuestionBoard []QuestionBoard, result bool) {
 	}
 	for rows.Next() {
 		tmpQuestionBoard := new(QuestionBoard)
-		err = rows.Scan(&tmpQuestionBoard.ClassId, &tmpQuestionBoard.Year, &tmpQuestionBoard.QuestionBoardId, &tmpQuestionBoard.StudentId, &tmpQuestionBoard.Question)
+		err = rows.Scan(&tmpQuestionBoard.ClassId, &tmpQuestionBoard.Year, &tmpQuestionBoard.QuestionBoardId, &tmpQuestionBoard.StudentId, &tmpQuestionBoard.Question, &tmpQuestionBoard.ClassName)
 		statement = `SELECT classId, questionBoardReplyId, studentId, reply
 					FROM questionBoardReplies
-					WHERE questionBoardId=?
+					WHERE questionBoardId=? AND classId=?
 					ORDER BY questionBoardReplyId`
 		stmt, err := db.Prepare(statement)
 		defer stmt.Close()
 		if err != nil {
 			return
 		}
-		replyRows, err := stmt.Query(tmpQuestionBoard.QuestionBoardId)
+		replyRows, err := stmt.Query(tmpQuestionBoard.QuestionBoardId, tmpQuestionBoard.ClassId)
 		for replyRows.Next() {
 			tmpQuestionBoardReply := new(QuestoinBoardReply)
 			err = replyRows.Scan(&tmpQuestionBoardReply.ClassId, &tmpQuestionBoardReply.QuestionBoardReplyId, &tmpQuestionBoardReply.StudentId, &tmpQuestionBoardReply.Reply)

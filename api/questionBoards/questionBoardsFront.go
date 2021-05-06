@@ -28,22 +28,25 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 		parsedUri := strings.Split(r.RequestURI, "/")
 
 		if parsedUri[1] == "questionBoards" {
-			questionBoard := new(questionBoardsObj.QuestionBoard)
 			result := new(questionBoardsObj.Result)
 			flg := false
-			var tmp string
-
-			questionBoard.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+			var (
+				tmp       string
+				classId   string
+				year      int
+				studentId string
+				question  string
+			)
+			classId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
 			tmp, flg = common.CheckInput(parsedUri[3], `\d{4}`)
-			questionBoard.Year, _ = strconv.Atoi(tmp)
-			questionBoard.StudentId, flg = common.CheckInput(parsedUri[4], `[0-9]{2}[A-Z][0-9]{3}`)
-			questionBoard.Question, flg = common.CheckInput(r.PostFormValue("question"), `.+`)
+			year, _ = strconv.Atoi(tmp)
+			studentId, flg = common.CheckInput(parsedUri[4], `[0-9]{2}[A-Z][0-9]{3}`)
+			question, flg = common.CheckInput(r.PostFormValue("question"), `.+`)
 
 			if flg {
 				w.WriteHeader(400)
 			} else {
-				result.Result = questionBoard.AddQuestionBoard()
-				result.Body = append(result.Body, *questionBoard)
+				result.Result, result.Body = questionBoardsObj.AddQuestionBoard(classId, year, studentId, question)
 				json, _ := json.Marshal(result)
 				w.Write(json)
 			}
@@ -62,7 +65,6 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 			// questionBoardReply.Year, _ = strconv.Atoi(tmp)
 			questionBoardReply.StudentId, flg = common.CheckInput(parsedUri[4], `[0-9]{2}[A-Z][0-9]{3}`)
 			questionBoardReply.Reply, flg = common.CheckInput(r.PostFormValue("reply"), `.+`)
-			fmt.Printf("%v\n", r.PostFormValue("reply"))
 
 			if flg {
 				w.WriteHeader(400)

@@ -2,7 +2,7 @@ let leftWrapper = document.getElementById('leftWrapper');
 let rightWrapper = document.getElementById('rightWrapper');
 let studentId = document.getElementById('studentId').innerText;
 
-function QuestionBoard(classId) {
+function QuestionBoard() {
     removeMainContent();
     GetQuestionBoard();
 }
@@ -13,7 +13,7 @@ function GetQuestionBoard() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let questionBoardInfo = JSON.parse(httpRequest.responseText);
-                SetQuestionBoard(questionBoardInfo);
+                SetQuestionBoards(questionBoardInfo);
             }
         }
     }
@@ -21,57 +21,97 @@ function GetQuestionBoard() {
     httpRequest.send();
 }
 
-function SetQuestionBoard(questionBoardInfo) {
+function SetQuestionBoards(questionBoardInfo) {
     let questionBoards = questionBoardInfo.body;
+    let questionText = document.createElement('input');
+    let questionButton = document.createElement('input');
+    let questionBoardForm = document.createElement('form');
+
+    questionText.setAttribute('type', 'text');
+    questionButton.setAttribute('type', 'button');
+    questionButton.setAttribute('value', 'send');
+    // ---------------------------------------------------------------------
+    questionButton.setAttribute('data-classid', '5005040');
+    // -------------------------------------------------------------------
+
+    questionButton.addEventListener('click', PostQuestionBoard);
+
+    questionBoardForm.appendChild(questionText);
+    questionBoardForm.appendChild(questionButton);
 
     if (questionBoards !== null) {
         questionBoards.map((questionBoard)=>{
-            let questionBoardWrapper = document.createElement('details');
-            let questionBoardWrapperSummary = document.createElement('summary');
-            let questionBoardWrapperClassId = document.createElement('div');
-            let questionBoardWrapperYear = document.createElement('div');
-            let questionBoardWrapperStudentId = document.createElement('div');
-            let questionBoardWrapperQuestion = document.createElement('div');
-            let questionBoardWrapperQuestionReply = document.createElement('div');
-            let questionBoardReplyText = document.createElement('input');
-            let questionBoardReplyButton = document.createElement('input');
-            let questionBoardReplyForm = document.createElement('form');
-
-            questionBoardWrapperClassId.innerText = `classId : ${questionBoard.classId}`;
-            questionBoardWrapperYear.innerText = `year : ${questionBoard.year}`;
-            questionBoardWrapperStudentId.innerText = `studentId : ${questionBoard.studentId}`;
-            questionBoardWrapperQuestion.innerText = `question : ${questionBoard.question}`;
-
-            questionBoardWrapperQuestionReply.setAttribute('id', `qb${questionBoard.classId}-${questionBoard.questionBoardId}`);
-
-            questionBoardReplyText.setAttribute('type', 'text');
-            questionBoardReplyButton.setAttribute('type', 'button');
-            questionBoardReplyButton.setAttribute('value', 'send');
-            questionBoardReplyButton.setAttribute('data-classid', questionBoard.classId);
-            questionBoardReplyButton.setAttribute('data-studentid', questionBoard.studentId);
-            questionBoardReplyButton.setAttribute('data-questionboardid', questionBoard.questionBoardId);
-            questionBoardReplyButton.addEventListener('click', PostQuestionBoardReply);
-            questionBoardReplyForm.appendChild(questionBoardReplyText);
-            questionBoardReplyForm.appendChild(questionBoardReplyButton);
-
-            if (questionBoard.questionBoardReply !== null) {
-                questionBoard.questionBoardReply.map((questionBoardReply)=>{
-                    let questionBoardReplytext = document.createElement('div');
-                    questionBoardReplytext.innerText = questionBoardReply.reply;
-                    questionBoardWrapperQuestionReply.appendChild(questionBoardReplytext);
-                });
-            }
-            questionBoardWrapperSummary.appendChild(questionBoardWrapperClassId);
-            questionBoardWrapperSummary.appendChild(questionBoardWrapperYear);
-            questionBoardWrapperSummary.appendChild(questionBoardWrapperStudentId);
-            questionBoardWrapperSummary.appendChild(questionBoardWrapperQuestion);
-            questionBoardWrapper.appendChild(questionBoardWrapperQuestionReply);
-            questionBoardWrapper.appendChild(questionBoardWrapperSummary);
-            questionBoardWrapper.appendChild(questionBoardReplyForm);
-            leftWrapper.appendChild(questionBoardWrapper);
+            SetQuestionBoard(questionBoard);
         });
-
     }
+    rightWrapper.appendChild(questionBoardForm);
+
+}
+
+function SetQuestionBoard(questionBoard) {
+    let questionBoardWrapper = document.createElement('details');
+    let questionBoardWrapperSummary = document.createElement('summary');
+    let questionBoardWrapperClassId = document.createElement('div');
+    let questionBoardWrapperYear = document.createElement('div');
+    let questionBoardWrapperStudentId = document.createElement('div');
+    let questionBoardWrapperQuestion = document.createElement('div');
+    let questionBoardWrapperQuestionReply = document.createElement('div');
+    let questionBoardReplyText = document.createElement('input');
+    let questionBoardReplyButton = document.createElement('input');
+    let questionBoardReplyForm = document.createElement('form');
+
+    questionBoardWrapperClassId.innerText = `classId : ${questionBoard.classId}`;
+    questionBoardWrapperYear.innerText = `year : ${questionBoard.year}`;
+    questionBoardWrapperStudentId.innerText = `studentId : ${questionBoard.studentId}`;
+    questionBoardWrapperQuestion.innerText = `question : ${questionBoard.question}`;
+
+    questionBoardWrapperQuestionReply.setAttribute('id', `qb${questionBoard.classId}-${questionBoard.questionBoardId}`);
+
+    questionBoardReplyText.setAttribute('type', 'text');
+    questionBoardReplyButton.setAttribute('type', 'button');
+    questionBoardReplyButton.setAttribute('value', 'send');
+    questionBoardReplyButton.setAttribute('data-classid', questionBoard.classId);
+    questionBoardReplyButton.setAttribute('data-studentid', questionBoard.studentId);
+    questionBoardReplyButton.setAttribute('data-questionboardid', questionBoard.questionBoardId);
+    questionBoardReplyButton.addEventListener('click', PostQuestionBoardReply);
+    questionBoardReplyForm.appendChild(questionBoardReplyText);
+    questionBoardReplyForm.appendChild(questionBoardReplyButton);
+
+    if (questionBoard.questionBoardReply !== null) {
+        questionBoard.questionBoardReply.map((questionBoardReply)=>{
+            let questionBoardReplytext = document.createElement('div');
+            questionBoardReplytext.innerText = questionBoardReply.reply;
+            questionBoardWrapperQuestionReply.appendChild(questionBoardReplytext);
+        });
+    }
+    questionBoardWrapperSummary.appendChild(questionBoardWrapperClassId);
+    questionBoardWrapperSummary.appendChild(questionBoardWrapperYear);
+    questionBoardWrapperSummary.appendChild(questionBoardWrapperStudentId);
+    questionBoardWrapperSummary.appendChild(questionBoardWrapperQuestion);
+    questionBoardWrapper.appendChild(questionBoardWrapperQuestionReply);
+    questionBoardWrapper.appendChild(questionBoardWrapperSummary);
+    questionBoardWrapper.appendChild(questionBoardReplyForm);
+    leftWrapper.appendChild(questionBoardWrapper);
+}
+
+function PostQuestionBoard(event) {
+    let classId = event.target.getAttribute('data-classid');
+    let question = event.target.previousElementSibling.value;
+
+    event.target.previousElementSibling.value = '';
+
+    let httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === XMLHttpRequest.DONE) {
+            if (httpRequest.status === 200) {
+                let questionBoardInfo = JSON.parse(httpRequest.responseText);
+                SetQuestionBoard(questionBoardInfo.body.pop())
+            }
+        }
+    }
+    httpRequest.open('POST', `/questionBoards/${classId}/2020/${studentId}/`, true);
+    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    httpRequest.send('question='+question);    
 }
 
 function PostQuestionBoardReply(event) {
