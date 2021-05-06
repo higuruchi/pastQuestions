@@ -2,6 +2,7 @@ package pastQuestionsFront
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -23,7 +24,7 @@ import (
 // ファイル名は乱数で決定
 // apiフォーマット
 // POST : /pastQuestion/<classId>/<year>/<semester>
-// GET : /pastQuestion/<classId>/year/<semester>
+// GET : /pastQuestion/<classId>/<fileId>/
 // 該当するファイルが複数ある場合は、fileIdの最も大きいものを送る
 
 func PastQuestions(w http.ResponseWriter, r *http.Request) {
@@ -63,20 +64,25 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		var flg bool
 		var tmp string
-		pastQuestion := new(pastQuestionsObj.PastQuestion)
+		var classId string
+		var fileId int
+		// pastQuestion := new(pastQuestionsObj.PastQuestion)
 		result := new(pastQuestionsObj.Result)
 		parsedUri := strings.Split(r.RequestURI, "/")
 
-		pastQuestion.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
-		tmp, flg = common.CheckInput(parsedUri[3], `\d{4}`)
-		pastQuestion.Year, _ = strconv.Atoi(tmp)
-		tmp, flg = common.CheckInput(parsedUri[4], `[1-4]`)
-		pastQuestion.Semester, _ = strconv.Atoi(tmp)
+		classId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+		tmp, flg = common.CheckInput(parsedUri[3], `\d+`)
+		fileId, _ = strconv.Atoi(tmp)
+		// tmp, flg = common.CheckInput(parsedUri[3], `\d{4}`)
+		// pastQuestion.Year, _ = strconv.Atoi(tmp)
+		// tmp, flg = common.CheckInput(parsedUri[4], `[1-4]`)
+		// pastQuestion.Semester, _ = strconv.Atoi(tmp)
 
 		if flg {
 			w.WriteHeader(400)
 		} else {
-			fileName, flg := pastQuestion.GetPastQuestion()
+			pastQuestions, flg := pastQuestionsObj.GetPastQuestion(classId, fileId)
+			fmt.Printf("%v\n", flg)
 
 			if !flg {
 				w.WriteHeader(404)
@@ -90,8 +96,7 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 				// w.Header().Set("Content-Length", string(len(data)))
 				// w.Write(data)
 				result.Result = true
-				pastQuestion.FileName = fileName
-				result.Body = append(result.Body, *pastQuestion)
+				result.Body = pastQuestions
 				json, _ := json.Marshal(result)
 				w.Write(json)
 			}

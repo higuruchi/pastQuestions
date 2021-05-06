@@ -15,8 +15,6 @@ function Home() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 classInfo = JSON.parse(httpRequest.responseText);
-                console.log(httpRequest.responseText);
-                console.log('ok');
                 setMainContent();
             }
         }
@@ -33,12 +31,7 @@ function Home() {
             li.addEventListener('click', GetPastQuestionAndComment)
             ul.appendChild(li);
         });
-        document.getElementById('main').appendChild(ul);
-    }
-
-    function removeMainContent() {
-        let main = document.getElementById('main');
-        main.innerHTML = '';
+        document.getElementById('leftWrapper').appendChild(ul);
     }
 }
 
@@ -77,12 +70,21 @@ function searchClass() {
             li.addEventListener('click', GetPastQuestionAndComment)
             ul.appendChild(li);
         });
-        document.getElementById('main').appendChild(ul);
+        document.getElementById('leftWrapper').appendChild(ul);
     }
 
-    function removeMainContent() {
-        let main = document.getElementById('main');
-        main.innerHTML = '';
-    }
+}
+function removeMainContent() {
+    removeRightContent();
+    removeleftContent();
+}
+
+function removeleftContent() {
+    let leftWrapper = document.getElementById('leftWrapper');
+    leftWrapper.innerHTML = '';
+}
+function removeRightContent() {
+    let rightWrapper = document.getElementById('rightWrapper');
+    rightWrapper.innerHTML = '';
 }
 export {Home, searchClass};

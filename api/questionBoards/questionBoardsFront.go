@@ -1,6 +1,7 @@
 package questionBoardsFront
 
 import (
+	"fmt"
 	"net/http"
 
 	"../common"
@@ -47,23 +48,26 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 				w.Write(json)
 			}
 		} else if parsedUri[1] == "questionBoardsReply" {
-			result := new(questionBoardsObj.Result)
+
+			result := new(questionBoardsObj.ResultRep)
 			flg := false
 			var tmp string
 			questionBoardReply := new(questionBoardsObj.QuestoinBoardReply)
 
 			questionBoardReply.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+
 			tmp, flg = common.CheckInput(parsedUri[3], `\d{1,}`)
 			questionBoardReply.QuestionBoardId, _ = strconv.Atoi(tmp)
 			// tmp, flg = common.CheckInput(parsedUri[4], `\d{4}`)
 			// questionBoardReply.Year, _ = strconv.Atoi(tmp)
 			questionBoardReply.StudentId, flg = common.CheckInput(parsedUri[4], `[0-9]{2}[A-Z][0-9]{3}`)
 			questionBoardReply.Reply, flg = common.CheckInput(r.PostFormValue("reply"), `.+`)
+			fmt.Printf("%v\n", r.PostFormValue("reply"))
 
 			if flg {
 				w.WriteHeader(400)
 			} else {
-				result.Result = questionBoardReply.AddQuestionBoardReply()
+				result.Result, result.Body = questionBoardReply.AddQuestionBoardReply()
 				json, _ := json.Marshal(result)
 				w.Write(json)
 			}
@@ -72,17 +76,18 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 	//  /questionBoard/classId/
 	case "GET":
 		parsedUri := strings.Split(r.RequestURI, "/")
-		questionBoard := new(questionBoardsObj.QuestionBoard)
+		var classId string
 		result := new(questionBoardsObj.Result)
 		flg := false
 
-		questionBoard.ClassId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
+		classId, flg = common.CheckInput(parsedUri[2], `[0-9]{1,7}`)
 		if flg {
-			w.WriteHeader(400)
+			result.Body, result.Result = questionBoardsObj.GetQuestionBoard()
 		} else {
-			result.Body, result.Result = questionBoard.GetQuestionBoard()
-			json, _ := json.Marshal(result)
-			w.Write(json)
+			fmt.Print("hello")
+			result.Body, result.Result = questionBoardsObj.GetQuestionBoardSelectedByClassId(classId)
 		}
+		json, _ := json.Marshal(result)
+		w.Write(json)
 	}
 }

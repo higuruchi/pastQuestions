@@ -30,7 +30,7 @@ var db *sql.DB
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.3:3306)/pastQuestion")
+	db, err = sql.Open("mysql", "root:F_2324@a@tcp(172.28.0.2:3306)/pastQuestion")
 	if err != nil {
 		panic(err)
 	}
@@ -105,30 +105,32 @@ func (pastQuestion *PastQuestion) SavePastQuestion(file []byte) (result bool) {
 	return
 }
 
-func (pastQuestion *PastQuestion) GetPastQuestion() (fileName string, result bool) {
+func GetPastQuestion(classId string, fileId int) (pastQuestions []PastQuestion, result bool) {
+	// statement := `SELECT CASE
+	// 				WHEN COUNT(*)=0 THEN "nothing"
+	// 				ELSE (SELECT classId, year, semester, fileId, fileName
+	// 					FROM pastQuestions
+	// 					WHERE classId=? AND year=? AND semester=?
+	// 					ORDER BY fileId DESC LIMIT 1) END AS fileName
+	// 				FROM pastQuestions
+	// 			WHERE classId=? LIMIT 10`
 
-	statement := `SELECT CASE
-					WHEN COUNT(*)=0 THEN "nothing"
-					ELSE (SELECT fileName
-						FROM pastQuestions
-						WHERE classId=? AND year=? AND semester=?
-						ORDER BY fileId DESC LIMIT 1) END AS fileName
+	statement := `SELECT classId, year, semester, fileId, fileName
 					FROM pastQuestions
-				WHERE classId=? AND year=? AND semester=?`
+					WHERE classId=? AND fileId>=? LIMIT 10`
 
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		return
 	}
-	err = stmt.QueryRow(pastQuestion.ClassId, pastQuestion.Year, pastQuestion.Semester, pastQuestion.ClassId, pastQuestion.Year, pastQuestion.Semester).Scan(&fileName)
-	if fileName == "nothing" {
-		return
-	}
-	fileName = "./pastQuestions/" + fileName + ".pdf"
-	// file, _ = os.Open("./pastQuestions/"+fileName+".pdf")
-	// data, _ = ioutil.ReadAll(file)
-	if err != nil {
-		return
+	rows, _ := stmt.Query(classId, fileId)
+	for rows.Next() {
+		pastQuestion := new(PastQuestion)
+		if err = rows.Scan(&pastQuestion.ClassId, &pastQuestion.Year, &pastQuestion.Semester, &pastQuestion.FileId, &pastQuestion.FileName); err != nil {
+			return
+		}
+		pastQuestion.FileName += ".pdf"
+		pastQuestions = append(pastQuestions, *pastQuestion)
 	}
 	result = true
 	return

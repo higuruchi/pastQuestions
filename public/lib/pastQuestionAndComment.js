@@ -1,17 +1,20 @@
 import GetComments from './comment.js'
+import GetPastQuestion from './pastQuestion.js'
 
 function GetPastQuestionAndComment(event) {
-    let pastQuestioInfo;
-    // let commentInfo;
-    const classId = event.target.getAttribute('data-classid')
-    // let pastQuestionWrapper = document.createElement('div').setAttribute('class', 'pastQuestionWrapper');
     // let commentsWrapper = document.createElement('div');
-    // commentsWrapper.setAttribute('class', 'commentsWrapper');
-    // document.getElementById('main').appendChild(pastQuestionWrapper);
-    // document.getElementById('main').appendChild(commentsWrapper);
+    // let pastQuestionWrapper = document.createElement('div');
+    const classId = event.target.getAttribute('data-classid');
+    let main = document.getElementById('main');
 
-    // GetPastQuestion();
-    removeMainContent();
+    // commentsWrapper.setAttribute('id', 'commentsWrapper');
+    // pastQuestionWrapper.setAttribute('id', 'pastQuestionWrapper');
+    removeleftContent();
+    removeRightContent();
+
+    // main.appendChild(pastQuestionWrapper);
+    // main.appendChild(commentsWrapper);
+    GetPastQuestion(classId);
     GetComments(classId);
 
     // let main = document.getElementById('main');
@@ -55,9 +58,14 @@ function GetPastQuestionAndComment(event) {
     //     removeMainContent();
     // }
 
-    function removeMainContent() {
-        let main = document.getElementById('main');
-        main.innerHTML = '';
+    function removeleftContent() {
+        let leftWrapper = document.getElementById('leftWrapper');
+        leftWrapper.innerHTML = '';
     }
+    function removeRightContent() {
+        let rightWrapper = document.getElementById('rightWrapper');
+        rightWrapper.innerHTML = '';
+    }
+
 }
 export default GetPastQuestionAndComment

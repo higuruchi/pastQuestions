@@ -1,6 +1,8 @@
-let commentsWrapper = document.createElement('div');
-commentsWrapper.setAttribute('class', 'commentsWrapper');
-let main = document.getElementById('main');
+// let commentsWrapper = document.createElement('div');
+// commentsWrapper.setAttribute('class', 'commentsWrapper');
+let commentsWrapper = document.getElementById('rightWrapper');
+let commentsWrapperOver = document.createElement('div');
+// let main = document.getElementById('main');
 
 
 function GetComments(classId) {
@@ -16,7 +18,6 @@ function GetComments(classId) {
     }
     httpRequest.open('GET', '/comments/main/?classId='+classId+'&commentId=0', true);
     httpRequest.send();
-    removeMainContent();
 }
 
 
@@ -34,9 +35,10 @@ function SetComments(commentInfo, classId) {
     button.setAttribute('flg', 'main');
     button.setAttribute('data-classid', classId);
     button.addEventListener('click', PostComment);
-    main.appendChild(commentsWrapper);
-    main.appendChild(text);
-    main.appendChild(button);
+    // main.appendChild(commentsWrapper);
+    commentsWrapper.appendChild(commentsWrapperOver)
+    commentsWrapper.appendChild(text);
+    commentsWrapper.appendChild(button);
 }
 
 function SetComment(comment) {
@@ -72,25 +74,30 @@ function SetComment(comment) {
             // let classId = event.target.getAttribute('id-classid');
             // let commentId = event.target.getAttribute('id-commentId');
             // console.log(event.target);
-        
-            let httpRequest = new XMLHttpRequest();
-            httpRequest.onreadystatechange = function() {
-                if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                    if (httpRequest.status === 200) {
-                        let replyComments = JSON.parse(httpRequest.responseText);
-                        replyComments.body.map((comment)=>{SetReplyComments(comment)});
+
+            // これでは不具合あり
+
+            if (this.nextElementSibling.firstElementChild === null) {
+                let httpRequest = new XMLHttpRequest();
+                httpRequest.onreadystatechange = function() {
+                    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                        if (httpRequest.status === 200) {
+                            let replyComments = JSON.parse(httpRequest.responseText);
+                            replyComments.body.map((comment)=>{SetReplyComments(comment)});
+                        }
                     }
                 }
+                httpRequest.open('GET', '/comments/reply/?classId='+comment.classId+'&commentId='+comment.commentId, true);
+                httpRequest.send();
             }
-            httpRequest.open('GET', '/comments/reply/?classId='+comment.classId+'&commentId='+comment.commentId, true);
-            httpRequest.send();
+        
         });
         
         details.appendChild(summary);
         details.appendChild(ul);
         details.appendChild(text);
         details.appendChild(button);
-        commentsWrapper.appendChild(details);
+        commentsWrapperOver.appendChild(details);
 }
 
 function PostComment(event) {
@@ -99,13 +106,14 @@ function PostComment(event) {
     let httpRequest = new XMLHttpRequest();
     const studentId = document.getElementById('studentId').textContent;
     const classId = event.target.getAttribute('data-classId');
+    event.target.previousElementSibling.value = ''
 
     if (flg === 'main') {
         httpRequest.onreadystatechange = function() {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let comment = JSON.parse(httpRequest.responseText);
-                    SetComment(comment.body);
+                    SetComment(comment.body[0]);
                 }
             }
         }
@@ -119,7 +127,7 @@ function PostComment(event) {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let comment = JSON.parse(httpRequest.responseText);
-                    SetReplyComments(comment.body);
+                    SetReplyComments(comment.body[0]);
                 }
             }
         }
@@ -129,37 +137,12 @@ function PostComment(event) {
     }
 }
 
-
-// function GetReplyComment(classId, commentId) {
-//     // let classId = event.target.getAttribute('id-classid');
-//     // let commentId = event.target.getAttribute('id-commentId');
-//     // console.log(event.target);
-
-//     let httpRequest = new XMLHttpRequest();
-//     httpRequest.onreadystatechange = function() {
-//         if (httpRequest.readyState === XMLHttpRequest.DONE) {
-//             if (httpRequest.status === 200) {
-//                 let replyComments = JSON.parse(httpRequest.responseText);
-//                 replyComments.body.map(SetReplyComments(comment));
-//             }
-//         }
-//     }
-//     httpRequest.open('GET', '/comments/reply/?classId='+classId&'commentId='+commentId, true);
-//     httpRequest.send();
-// }
-
 function SetReplyComments(comment) {
-    console.log(comment.commentId);
     let ul = document.getElementById('commentId'+comment.commentId);
     let li = document.createElement('li');
     console.log(ul);
     li.innerHTML = `${comment.comment}`;
     ul.appendChild(li);
-}
-
-function removeMainContent() {
-    let main = document.getElementById('main');
-    main.innerHTML = '';
 }
 
 export default GetComments;
