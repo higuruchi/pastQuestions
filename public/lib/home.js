@@ -15,24 +15,28 @@ function Home() {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 classInfo = JSON.parse(httpRequest.responseText);
-                setMainContent();
+                setMainContent(classInfo);
             }
         }
 
     }
 
-    function setMainContent() {
-        removeMainContent();
-        let ul = document.createElement('ul');
-        classInfo.body.map(function(content) {
-            let li = document.createElement('li');
-            li.innerHTML = `授業ID：${content.classId}　　授業名：${content.className}`;
-            li.setAttribute('data-classid', content.classId);
-            li.addEventListener('click', GetPastQuestionAndComment)
-            ul.appendChild(li);
-        });
-        document.getElementById('leftWrapper').appendChild(ul);
-    }
+}
+function setMainContent(classInfo) {
+    removeMainContent();
+    let ul = document.createElement('ul');
+    ul.setAttribute('class', 'classes');
+    classInfo.body.map(function(content) {
+        let li = document.createElement('li');
+        let className = document.createElement('div');
+        className.innerText = `${content.className}`
+        li.appendChild(className);
+        li.setAttribute('data-classid', content.classId);
+        className.setAttribute('data-classid', content.classId);
+        li.addEventListener('click', GetPastQuestionAndComment)
+        ul.appendChild(li);
+    });
+    document.getElementById('leftWrapper').appendChild(ul);
 }
 
 function searchClass() {
@@ -53,26 +57,11 @@ function searchClass() {
             if (httpRequest.status === 200) {
                 classInfo = JSON.parse(httpRequest.responseText);
                 console.log(httpRequest.responseText);
-                console.log('ok');
-                setMainContent();
+                setMainContent(classInfo);
             }
         }
 
     }
-
-    function setMainContent() {
-        removeMainContent();
-        let ul = document.createElement('ul');
-        classInfo.body.map(function(content) {
-            let li = document.createElement('li');
-            li.innerHTML = `授業ID：${content.classId}　　授業名：${content.className}`;
-            li.setAttribute('data-classid', content.classId);
-            li.addEventListener('click', GetPastQuestionAndComment)
-            ul.appendChild(li);
-        });
-        document.getElementById('leftWrapper').appendChild(ul);
-    }
-
 }
 function removeMainContent() {
     removeRightContent();

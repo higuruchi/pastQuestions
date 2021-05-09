@@ -1,0 +1,19 @@
+#aside li {
+    height: 40px;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-top: 10px;
+}
+
+#aside li:hover {
+    background-color: rgb(219, 219, 219);
+}
+
+#aside i {
+    padding-left: 20px;
+    padding-right: 30px;
+}
+#aside .fas {
+    font-size: 20px;
+    color: #49add1;
+}

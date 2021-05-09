@@ -48,17 +48,23 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 		if flg {
 			w.WriteHeader(400)
 		} else {
-			fileHeader := r.MultipartForm.File["pastQuestion"][0]
-			file, err := fileHeader.Open()
-			if err != nil {
-				return
-			}
 
-			data, _ := ioutil.ReadAll(file)
-			result.Result = pastQuestion.SavePastQuestion(data)
-			result.Body = append(result.Body, *pastQuestion)
-			json, _ := json.Marshal(result)
-			w.Write(json)
+			if flg, _ := common.CheckLogin(r); !flg {
+				w.WriteHeader(403)
+				return
+			} else {
+				fileHeader := r.MultipartForm.File["pastQuestion"][0]
+				file, err := fileHeader.Open()
+				if err != nil {
+					return
+				}
+
+				data, _ := ioutil.ReadAll(file)
+				result.Result = pastQuestion.SavePastQuestion(data)
+				result.Body = append(result.Body, *pastQuestion)
+				json, _ := json.Marshal(result)
+				w.Write(json)
+			}
 		}
 
 	case "GET":
@@ -73,10 +79,6 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 		classId, flg = common.CheckInput(parsedUri[2], `[0-9]{0,7}`)
 		tmp, flg = common.CheckInput(parsedUri[3], `\d+`)
 		fileId, _ = strconv.Atoi(tmp)
-		// tmp, flg = common.CheckInput(parsedUri[3], `\d{4}`)
-		// pastQuestion.Year, _ = strconv.Atoi(tmp)
-		// tmp, flg = common.CheckInput(parsedUri[4], `[1-4]`)
-		// pastQuestion.Semester, _ = strconv.Atoi(tmp)
 
 		if flg {
 			w.WriteHeader(400)
@@ -87,14 +89,6 @@ func PastQuestions(w http.ResponseWriter, r *http.Request) {
 			if !flg {
 				w.WriteHeader(404)
 			} else {
-				// fileName, _ := pastQuestion.GetPastQuestion()
-				// data, _ := ioutil.ReadFile(fileName)
-				// buf := make([]byte, 32 << 20)
-				// data.Read(buf)
-				// w.Header().Set("Content-Disposition", "attachment; filename=pastQuestion.pdf")
-				// w.Header().Set("Content-Type", "application/pdf")
-				// w.Header().Set("Content-Length", string(len(data)))
-				// w.Write(data)
 				result.Result = true
 				result.Body = pastQuestions
 				json, _ := json.Marshal(result)

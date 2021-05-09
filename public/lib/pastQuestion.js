@@ -18,6 +18,8 @@ function GetPastQuestion(classId) {
 }
 
 function SetPastQuestions(pastQuestionInfo, classId) {
+    // removeleftContent();
+
     let pastQuestions = pastQuestionInfo.body;
     let form = document.createElement('form');
     let inputFile = document.createElement('input');
@@ -113,4 +115,18 @@ function PostPastQuestion(event) {
     httpRequest.open('POST', `/pastQuestion/${classId}/${year}/${semester}/`, true);
     httpRequest.send(data);
 }
+
+// function removeMainContent() {
+//     removeRightContent();
+//     removeleftContent();
+// }
+
+// function removeleftContent() {
+//     let leftWrapper = document.getElementById('leftWrapper');
+//     leftWrapper.innerHTML = '';
+// }
+// function removeRightContent() {
+//     let rightWrapper = document.getElementById('rightWrapper');
+//     rightWrapper.innerHTML = '';
+// }
 export default GetPastQuestion;

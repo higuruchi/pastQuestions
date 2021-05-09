@@ -19,6 +19,11 @@ import (
 func Comments(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
+		if flg, studentId := common.CheckLogin(r); !(flg && studentId == r.PostFormValue("studentId")) {
+			w.WriteHeader(403)
+			return
+		}
+
 		flg := false
 		// var tmp string
 		comment := new(commentMains.Comment)
@@ -75,6 +80,10 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case "PUT":
+		if flg, _ := common.CheckLogin(r); !flg {
+			w.WriteHeader(403)
+			return
+		}
 		result := new(commentMains.Result)
 		comment := new(commentMains.Comment)
 		parsedUri := strings.Split(r.RequestURI, "/")
@@ -111,6 +120,12 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 func CommentReplies(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
+
+		if flg, studentId := common.CheckLogin(r); !(flg && studentId == r.PostFormValue("studentId")) {
+			w.WriteHeader(403)
+			return
+		}
+
 		flg := false
 		var tmp string
 		commentReply := new(commentReplies.CommentReply)

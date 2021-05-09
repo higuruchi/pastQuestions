@@ -1,6 +1,6 @@
 let leftWrapper = document.getElementById('leftWrapper');
 let rightWrapper = document.getElementById('rightWrapper');
-let studentId = document.getElementById('studentId').innerText;
+let studentId = document.getElementById('studentId').value;
 
 function QuestionBoard() {
     removeMainContent();
@@ -30,6 +30,7 @@ function SetQuestionBoards(questionBoardInfo) {
     questionText.setAttribute('type', 'text');
     questionButton.setAttribute('type', 'button');
     questionButton.setAttribute('value', 'send');
+    // 
     // ---------------------------------------------------------------------
     questionButton.setAttribute('data-classid', '5005040');
     // -------------------------------------------------------------------
@@ -60,7 +61,7 @@ function SetQuestionBoard(questionBoard) {
     let questionBoardReplyButton = document.createElement('input');
     let questionBoardReplyForm = document.createElement('form');
 
-    questionBoardWrapperClassId.innerText = `classId : ${questionBoard.classId}`;
+    questionBoardWrapperClassId.innerText = `className : ${questionBoard.className}`;
     questionBoardWrapperYear.innerText = `year : ${questionBoard.year}`;
     questionBoardWrapperStudentId.innerText = `studentId : ${questionBoard.studentId}`;
     questionBoardWrapperQuestion.innerText = `question : ${questionBoard.question}`;

@@ -11,7 +11,6 @@ function GetComments(classId) {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
             if (httpRequest.status === 200) {
                 let commentInfo = JSON.parse(httpRequest.responseText);
-                console.log(commentInfo);
                 SetComments(commentInfo, classId);
             }
         }
@@ -22,8 +21,9 @@ function GetComments(classId) {
 
 
 function SetComments(commentInfo, classId) {
-    let comments = commentInfo.body;
 
+    let comments = commentInfo.body;
+    
     comments.map((comment)=>{SetComment(comment)});
     let text = document.createElement('input');
     let button = document.createElement('button');
@@ -104,7 +104,7 @@ function PostComment(event) {
     let flg = event.target.getAttribute('flg');
     let comment = event.target.getAttribute('data-text');
     let httpRequest = new XMLHttpRequest();
-    const studentId = document.getElementById('studentId').textContent;
+    const studentId = document.getElementById('studentId').value;
     const classId = event.target.getAttribute('data-classId');
     event.target.previousElementSibling.value = ''
 
@@ -144,5 +144,20 @@ function SetReplyComments(comment) {
     li.innerHTML = `${comment.comment}`;
     ul.appendChild(li);
 }
+
+// function removeMainContent() {
+//     removeRightContent();
+//     removeleftContent();
+// }
+
+// function removeleftContent() {
+//     let leftWrapper = document.getElementById('leftWrapper');
+//     leftWrapper.innerHTML = '';
+// }
+// function removeRightContent() {
+//     let rightWrapper = document.getElementById('rightWrapper');
+//     console.log(rightWrapper);
+//     rightWrapper.innerHTML = '';
+// }
 
 export default GetComments;

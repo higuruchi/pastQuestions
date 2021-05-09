@@ -1,10 +1,12 @@
 package loginLogoutFront
 
 import (
-	"net/http"
-	"github.com/gorilla/sessions"
-	"./loginLogoutObj"
 	"encoding/json"
+	"net/http"
+
+	"./loginLogoutObj"
+	"github.com/gorilla/sessions"
+
 	// "regexp"
 	"../common"
 	// "fmt"
@@ -13,24 +15,11 @@ import (
 var sessionName = "gsid"
 var store = sessions.NewCookieStore([]byte(sessionName))
 
-// func common.CheckInput(val string, check string) (ret string, err bool) {
-// 	r := regexp.MustCompile(check)
-// 	if r.MatchString(val) {
-// 		err = false
-// 		ret = val
-// 		return
-// 	} else {
-// 		err = true
-// 		return
-// 	}
-// }
-
-
 func Login(w http.ResponseWriter, r *http.Request) {
 	var (
-		flg bool
+		flg       bool
 		studentId string
-		password string
+		password  string
 	)
 	student := new(loginLogoutObj.Student)
 	result := new(loginLogoutObj.Result)
@@ -39,17 +28,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	password, flg = common.CheckInput(r.PostFormValue("password"), `.+`)
 
 	if flg {
-		json, _ := json.Marshal(result)
-		w.Write(json)
+		w.WriteHeader(400)
 	}
 
 	student.StudentId = studentId
-	
+
 	if student.Login(password) {
 
 		session, _ := store.Get(r, sessionName)
 		session.Values["login"] = true
-		session.Values["StudentId"] = student.StudentId
+		session.Values["studentId"] = student.StudentId
 		session.Values["studentName"] = student.StudentName
 		err := session.Save(r, w)
 		if err != nil {

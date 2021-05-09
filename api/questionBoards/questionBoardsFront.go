@@ -46,9 +46,13 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 			if flg {
 				w.WriteHeader(400)
 			} else {
-				result.Result, result.Body = questionBoardsObj.AddQuestionBoard(classId, year, studentId, question)
-				json, _ := json.Marshal(result)
-				w.Write(json)
+				if flg, tmpStudentId := common.CheckLogin(r); !(flg && studentId == tmpStudentId) {
+					w.WriteHeader(403)
+				} else {
+					result.Result, result.Body = questionBoardsObj.AddQuestionBoard(classId, year, studentId, question)
+					json, _ := json.Marshal(result)
+					w.Write(json)
+				}
 			}
 		} else if parsedUri[1] == "questionBoardsReply" {
 
@@ -69,9 +73,13 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 			if flg {
 				w.WriteHeader(400)
 			} else {
-				result.Result, result.Body = questionBoardReply.AddQuestionBoardReply()
-				json, _ := json.Marshal(result)
-				w.Write(json)
+				if flg, studentId := common.CheckLogin(r); !(flg && studentId == questionBoardReply.StudentId) {
+					w.WriteHeader(403)
+				} else {
+					result.Result, result.Body = questionBoardReply.AddQuestionBoardReply()
+					json, _ := json.Marshal(result)
+					w.Write(json)
+				}
 			}
 		}
 

@@ -1,31 +1,34 @@
 package common
 
 import (
-	"regexp"
-	"math/rand"
-	"time"
-	"io"
-	"fmt"
 	"crypto/md5"
+	"fmt"
+	"io"
+	"math/rand"
+	"net/http"
+	"regexp"
+	"time"
+
+	"github.com/gorilla/sessions"
 )
 
-func MakeRandomStr(digit uint32) (string) {
-    const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+func MakeRandomStr(digit uint32) string {
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-    // 乱数を生成
-    b := make([]byte, digit)
+	// 乱数を生成
+	b := make([]byte, digit)
 	rand.Seed(time.Now().UnixNano())
-    if _, err := rand.Read(b); err != nil {
-        return ""
-    }
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
 
-    // letters からランダムに取り出して文字列を生成
-    var result string
-    for _, v := range b {
-        // index が letters の長さに収まるように調整
-        result += string(letters[int(v)%len(letters)])
-    }
-    return result
+	// letters からランダムに取り出して文字列を生成
+	var result string
+	for _, v := range b {
+		// index が letters の長さに収まるように調整
+		result += string(letters[int(v)%len(letters)])
+	}
+	return result
 }
 
 func CheckInput(val string, check string) (ret string, err bool) {
@@ -40,7 +43,7 @@ func CheckInput(val string, check string) (ret string, err bool) {
 	}
 }
 
-func EncriptPassword(password string) (string) {
+func EncriptPassword(password string) string {
 	h := md5.New()
 	io.WriteString(h, password)
 	pwmd5 := fmt.Sprintf("%x", h.Sum(nil))
@@ -52,4 +55,17 @@ func EncriptPassword(password string) (string) {
 	io.WriteString(h, pwmd5)
 	password = fmt.Sprintf("%x", h.Sum(nil))
 	return password
+}
+
+func CheckLogin(r *http.Request) (flg bool, studentId string) {
+	var sessionName = "gsid"
+	var store = sessions.NewCookieStore([]byte(sessionName))
+
+	session, _ := store.Get(r, sessionName)
+
+	if session.Values["login"] == true {
+		flg = true
+		studentId = session.Values["studentId"].(string)
+	}
+	return
 }

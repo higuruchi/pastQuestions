@@ -21,6 +21,7 @@ func QuestionBoardReplies(w http.ResponseWriter, r *http.Request) {
 	// <name="studentId">
 	// <name="reply">
 	case "POST":
+
 		result := new(questionBoardRepliesObj.Result)
 		questionBoardReply := new(questionBoardRepliesObj.QuestionBoardReply)
 		var (
@@ -42,13 +43,18 @@ func QuestionBoardReplies(w http.ResponseWriter, r *http.Request) {
 		if flg {
 			w.WriteHeader(400)
 		} else {
-			ok := questionBoardReply.AddQuestionBoardReply()
-			if ok {
-				result.Body = append(result.Body, *questionBoardReply)
-				json, _ := json.Marshal(result)
-				w.Write(json)
+			if flg, studentId := common.CheckLogin(r); !(flg && studentId == r.PostFormValue("studentId")) {
+				w.WriteHeader(403)
+				return
 			} else {
-				w.WriteHeader(400)
+				ok := questionBoardReply.AddQuestionBoardReply()
+				if ok {
+					result.Body = append(result.Body, *questionBoardReply)
+					json, _ := json.Marshal(result)
+					w.Write(json)
+				} else {
+					w.WriteHeader(400)
+				}
 			}
 		}
 	case "GET":

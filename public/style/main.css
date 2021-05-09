@@ -1,0 +1,16 @@
+#main {
+    margin-top: 50px;
+}
+
+#main ul.classes li {
+    margin-bottom: 20px;
+    padding-top: 20px;
+    padding-left: 10px;
+    min-height: 50px;
+    width: 600px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #3285a3;
+    border: 2px solid;
+    border-radius: 10px;
+}

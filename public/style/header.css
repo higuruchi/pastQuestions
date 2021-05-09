@@ -1,0 +1,74 @@
+header {
+    height: 50px;
+    box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+header div.search input[type="text"] {
+
+    padding: 0;
+    background-color: #dddfdf;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    transition: 0.5s;
+    border-radius: 10px 0px 0px 10px;
+    height: 30px;
+}
+
+header div.search button {
+    padding: 0;
+    background-color: #72c7e6;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    transition: 0.5s;
+    border-radius: 0px 10px 10px 0px;
+    height: 30px;
+    width: 40px;
+}
+
+header div.search button:hover {
+    background-color: #49add1;
+    color: #fff;
+    transition: 0.5s;
+}
+
+header div.search label {
+    margin-left: 30px;
+}
+
+.fa-sign-in-alt {
+    font-size: 25px;
+    color: #49add1;
+}
+
+.loginForm {
+    position: absolute;
+    top: -250px;
+    right: 300px;
+    transition: all 0.2s;
+}
+.loginForm form {
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fdfdfd;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+}
+.loginForm form input[type="text"],  .loginForm form input[type="password"]{
+    padding: 0;
+    background-color: #fdfdfd;
+    color: #fff;
+    border: none;
+    transition: 0.5s;
+    border-bottom: 1px solid black;
+    height: 30px;
+}
+.loginForm form input[type="button"] {
+    height: 30px;
+    border: none;
+    background-color: #49add1;
+    border-radius: 10px 10px 10px 10px;
+}

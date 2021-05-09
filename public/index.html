@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>過去問データベース</title>
-    <link rel="stylesheet" href="style.css?2">
+    <link rel="stylesheet" href="./style/style.css?">
+    <link rel="stylesheet" href="./style/header.css?1">
+    <link rel="stylesheet" href="./style/aside.css?1">
+    <link rel="stylesheet" href="./style/main.css?2">
     <script type="module" src="index.js?1"></script>
     <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
     <!-- <script type="module" src="./lib/home.js"></script> -->
-
 </head>
 <body>
-    <hidden id="studentId">19T325</hidden>
     <input id="menu" type="checkbox">
     <label for="menu" class="back"></label>
     <div class="navIconWrap open">
@@ -23,22 +24,31 @@
     <aside id="aside">
         <nav>
             <ul>
-                <li class="home">ホーム</li>
-                <li class="questionBoard">質問掲示板</li>
-                <li class="student">ユーザ情報</li>
+                <li class="home"><i class="fas fa-home"></i>ホーム</li>
+                <li class="questionBoard"><i class="fas fa-question"></i>質問掲示板</li>
+                <li class="student"><i class="fas fa-user"></i>ユーザ情報</li>
             </ul>
         </nav>
         <div class="sideFooter">
             side footer
         </div>
     </aside>
+    <input type="checkbox" id="login">
+    <div class="loginForm">
+        <form>
+            <input type="text" name="studentId" placeholder="studentId">
+            <input type="password" name="password" placeholder="password">
+            <input type="button" value="sign in" id="loginButton">
+        </form>
+    </div>
     <header id="header">
         <div class="search">
-            <input type="text">
-            <button>検索</button>
+            <input type="text"><button><i class="fas fa-search"></i></button>
+            <label for="login"><i class="fas fa-sign-in-alt"></i></label>
         </div>
     </header>
     <main id="main">
+        <input type="hidden" id="studentId">
         <div id="leftWrapper">
         </div>
         <div id="rightWrapper">

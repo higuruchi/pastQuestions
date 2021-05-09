@@ -3,18 +3,13 @@ package loginLogoutObj
 import (
 	"database/sql"
 
-	_ "github.com/go-sql-driver/mysql"
-
-	// "crypto/md5"
-	// "io"
-	"fmt"
-
 	"../../common"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Student struct {
-	StudentId   string
-	StudentName string
+	StudentId   string `json:"studentId"`
+	StudentName string `json:"studentName	"`
 }
 type Result struct {
 	Result bool    `json:"result"`
@@ -40,14 +35,12 @@ func (student *Student) Login(password string) (result bool) {
 					WHERE studentId=? AND password=?`
 	stmt, err := db.Prepare(statement)
 	if err != nil {
-		fmt.Printf("%v\n", err)
 		return
 	}
 	defer stmt.Close()
 	password = common.EncriptPassword(password)
 	err = stmt.QueryRow(student.StudentId, password).Scan(&student.StudentName)
 	if err != nil || student.StudentName == "nothing" {
-
 		return
 	}
 	result = true
