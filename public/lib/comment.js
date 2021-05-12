@@ -1,8 +1,5 @@
-// let commentsWrapper = document.createElement('div');
-// commentsWrapper.setAttribute('class', 'commentsWrapper');
-let commentsWrapper = document.getElementById('rightWrapper');
+
 let commentsWrapperOver = document.createElement('div');
-// let main = document.getElementById('main');
 
 
 function GetComments(classId) {
@@ -21,8 +18,10 @@ function GetComments(classId) {
 
 
 function SetComments(commentInfo, classId) {
-
+    commentsWrapperOver.innerHTML = '';
     let comments = commentInfo.body;
+    let commentsWrapper = document.getElementById('rightWrapper');
+    console.log(commentsWrapper);
     
     comments.map((comment)=>{SetComment(comment)});
     let text = document.createElement('input');
@@ -36,68 +35,69 @@ function SetComments(commentInfo, classId) {
     button.setAttribute('data-classid', classId);
     button.addEventListener('click', PostComment);
     // main.appendChild(commentsWrapper);
-    commentsWrapper.appendChild(commentsWrapperOver)
+    commentsWrapper.appendChild(commentsWrapperOver);
     commentsWrapper.appendChild(text);
     commentsWrapper.appendChild(button);
 }
 
 function SetComment(comment) {
-        let details = document.createElement('details');
-        let summary = document.createElement('summary');
-        let divup = document.createElement('div');
-        let divdown = document.createElement('div');
-        let text = document.createElement('input');
-        let button = document.createElement('button');
-        let ul = document.createElement('ul');
-        summary.setAttribute('data-classid', comment.classId);
-        summary.setAttribute('data-commentid', comment.commentId);
-        ul.setAttribute('id', 'commentId'+comment.commentId);
-        text.setAttribute('type', 'text');
-        text.addEventListener('change', function() {
-            button.setAttribute('data-text', text.value)
-        });
-        button.innerText = 'send';
-        button.setAttribute('flg', 'reply');
-        button.setAttribute('data-classid', comment.classId);
-        button.setAttribute('data-commentid', comment.commentId);
-        button.addEventListener('click', PostComment)
 
-        divup.innerHTML = `${comment.studentId} ${comment.comment}`;
-        // good bad　未作成
+    let details = document.createElement('details');
+    let summary = document.createElement('summary');
+    let divup = document.createElement('div');
+    let divdown = document.createElement('div');
+    let text = document.createElement('input');
+    let button = document.createElement('button');
+    let ul = document.createElement('ul');
+    summary.setAttribute('data-classid', comment.classId);
+    summary.setAttribute('data-commentid', comment.commentId);
+    ul.setAttribute('id', 'commentId'+comment.commentId);
+    text.setAttribute('type', 'text');
+    text.addEventListener('change', function() {
+        button.setAttribute('data-text', text.value)
+    });
+    button.innerText = 'send';
+    button.setAttribute('flg', 'reply');
+    button.setAttribute('data-classid', comment.classId);
+    button.setAttribute('data-commentid', comment.commentId);
+    button.addEventListener('click', PostComment)
 
-        divdown.innerHTML = `<i class="fas fa-thumbs-up"></i>${comment.good} <i class="fas fa-thumbs-down"></i>${comment.bad}`
-        summary.appendChild(divup);
-        summary.appendChild(divdown);
+    divup.innerHTML = `${comment.studentId} ${comment.comment}`;
+    // good bad　未作成
 
-        // 改良する必要があり
-        summary.addEventListener('click', function() {
-            // let classId = event.target.getAttribute('id-classid');
-            // let commentId = event.target.getAttribute('id-commentId');
-            // console.log(event.target);
+    divdown.innerHTML = `<i class="fas fa-thumbs-up"></i>${comment.good} <i class="fas fa-thumbs-down"></i>${comment.bad}`
+    summary.appendChild(divup);
+    summary.appendChild(divdown);
 
-            // これでは不具合あり
+    // 改良する必要があり
+    summary.addEventListener('click', function() {
+        // let classId = event.target.getAttribute('id-classid');
+        // let commentId = event.target.getAttribute('id-commentId');
+        // console.log(event.target);
 
-            if (this.nextElementSibling.firstElementChild === null) {
-                let httpRequest = new XMLHttpRequest();
-                httpRequest.onreadystatechange = function() {
-                    if (httpRequest.readyState === XMLHttpRequest.DONE) {
-                        if (httpRequest.status === 200) {
-                            let replyComments = JSON.parse(httpRequest.responseText);
-                            replyComments.body.map((comment)=>{SetReplyComments(comment)});
-                        }
+        // これでは不具合あり
+
+        if (this.nextElementSibling.firstElementChild === null) {
+            let httpRequest = new XMLHttpRequest();
+            httpRequest.onreadystatechange = function() {
+                if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                    if (httpRequest.status === 200) {
+                        let replyComments = JSON.parse(httpRequest.responseText);
+                        replyComments.body.map((comment)=>{SetReplyComments(comment)});
                     }
                 }
-                httpRequest.open('GET', '/comments/reply/?classId='+comment.classId+'&commentId='+comment.commentId, true);
-                httpRequest.send();
             }
-        
-        });
-        
-        details.appendChild(summary);
-        details.appendChild(ul);
-        details.appendChild(text);
-        details.appendChild(button);
-        commentsWrapperOver.appendChild(details);
+            httpRequest.open('GET', '/comments/reply/?classId='+comment.classId+'&commentId='+comment.commentId, true);
+            httpRequest.send();
+        }
+    
+    });
+    
+    details.appendChild(summary);
+    details.appendChild(ul);
+    details.appendChild(text);
+    details.appendChild(button);
+    commentsWrapperOver.appendChild(details);
 }
 
 function PostComment(event) {

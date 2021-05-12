@@ -5,7 +5,6 @@ function GetPastQuestionAndComment(event) {
     const classId = event.target.getAttribute('data-classid');
     console.log(document.getElementById("main"))
     removeMainContent();
-    console.log(document.getElementById("main"))
     
     GetPastQuestion(classId);
     GetComments(classId);

@@ -1,7 +1,7 @@
 // let pastQuestionWrapper = document.createElement('div');
 // pastQuestionWrapper.setAttribute('class', 'pastQuestionWrapper');
-let pastQuestionWrapper = document.getElementById('leftWrapper');
-let pastQuestionWrapperOver = document.createElement('div');
+// let pastQuestionWrapper = document.getElementById('leftWrapper');
+// let pastQuestionWrapperOver = document.createElement('div');
 
 function GetPastQuestion(classId) {
     let httpRequest = new XMLHttpRequest();
@@ -18,9 +18,9 @@ function GetPastQuestion(classId) {
 }
 
 function SetPastQuestions(pastQuestionInfo, classId) {
-    // removeleftContent();
-
     let pastQuestions = pastQuestionInfo.body;
+    let pastQuestionWrapperOver = document.createElement('div');
+    let pastQuestionWrapper = document.getElementById('leftWrapper');
     let form = document.createElement('form');
     let inputFile = document.createElement('input');
     let inputSubmit = document.createElement('input');
@@ -34,6 +34,7 @@ function SetPastQuestions(pastQuestionInfo, classId) {
     };
     let now = new Date();
     let nowSemester;
+
     if (4 <= now.getMonth()+1 <= 5) {
         nowSemester = 1;
     } else if (6 <= now.getMonth()+1 <= 9) {
@@ -89,7 +90,7 @@ function SetPastQuestions(pastQuestionInfo, classId) {
     form.appendChild(inputSubmit);
     pastQuestionWrapperOver.appendChild(form);
     pastQuestionWrapper.appendChild(pastQuestionWrapperOver);
-    
+    pastQuestionWrapperOver = null;
 }
 
 function PostPastQuestion(event) {
@@ -115,18 +116,4 @@ function PostPastQuestion(event) {
     httpRequest.open('POST', `/pastQuestion/${classId}/${year}/${semester}/`, true);
     httpRequest.send(data);
 }
-
-// function removeMainContent() {
-//     removeRightContent();
-//     removeleftContent();
-// }
-
-// function removeleftContent() {
-//     let leftWrapper = document.getElementById('leftWrapper');
-//     leftWrapper.innerHTML = '';
-// }
-// function removeRightContent() {
-//     let rightWrapper = document.getElementById('rightWrapper');
-//     rightWrapper.innerHTML = '';
-// }
 export default GetPastQuestion;
