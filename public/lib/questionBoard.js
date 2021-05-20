@@ -23,11 +23,11 @@ function GetQuestionBoard() {
 
 function SetQuestionBoards(questionBoardInfo) {
     let questionBoards = questionBoardInfo.body;
-    let questionText = document.createElement('input');
+    let questionText = document.createElement('textarea');
     let questionButton = document.createElement('input');
     let questionBoardForm = document.createElement('form');
 
-    questionText.setAttribute('type', 'text');
+    // questionText.setAttribute('type', 'text');
     questionButton.setAttribute('type', 'button');
     questionButton.setAttribute('value', 'send');
     // 
@@ -99,20 +99,23 @@ function PostQuestionBoard(event) {
     let classId = event.target.getAttribute('data-classid');
     let question = event.target.previousElementSibling.value;
 
-    event.target.previousElementSibling.value = '';
-
-    let httpRequest = new XMLHttpRequest();
-    httpRequest.onreadystatechange = function() {
-        if (httpRequest.readyState === XMLHttpRequest.DONE) {
-            if (httpRequest.status === 200) {
-                let questionBoardInfo = JSON.parse(httpRequest.responseText);
-                SetQuestionBoard(questionBoardInfo.body.pop())
+    if (question !== '') {
+        event.target.previousElementSibling.value = '';
+    
+        let httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function() {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    let questionBoardInfo = JSON.parse(httpRequest.responseText);
+                    console.log('hogehoge');
+                    SetQuestionBoard(questionBoardInfo.body.pop());
+                }
             }
         }
+        httpRequest.open('POST', `/questionBoards/${classId}/2020/${studentId}/`, true);
+        httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        httpRequest.send('question='+question);
     }
-    httpRequest.open('POST', `/questionBoards/${classId}/2020/${studentId}/`, true);
-    httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    httpRequest.send('question='+question);    
 }
 
 function PostQuestionBoardReply(event) {

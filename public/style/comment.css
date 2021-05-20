@@ -11,7 +11,7 @@ details ul {
 main input[type="text"]{
     padding: 0;
     background-color: #dddfdf;
-    color: #fff;
+    /*color: #fff*/
     border: none;
     font-size: 20px;
     transition: 0.5s;
@@ -21,7 +21,7 @@ main input[type="text"]{
 main button, main input[type="button"]{
     padding: 0;
     background-color: #72c7e6;
-    color: #fff;
+    /*color: #fff*/
     border: none;
     font-size: 20px;
     transition: 0.5s;

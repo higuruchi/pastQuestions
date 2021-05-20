@@ -46,7 +46,7 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 			if flg {
 				w.WriteHeader(400)
 			} else {
-				if flg, tmpStudentId := common.CheckLogin(r); !(flg && studentId == tmpStudentId) {
+				if loginFlg, tmpStudentId := common.CheckLogin(r); !(loginFlg && studentId == tmpStudentId) {
 					w.WriteHeader(403)
 				} else {
 					result.Result, result.Body = questionBoardsObj.AddQuestionBoard(classId, year, studentId, question)
@@ -73,7 +73,7 @@ func QuestionBoards(w http.ResponseWriter, r *http.Request) {
 			if flg {
 				w.WriteHeader(400)
 			} else {
-				if flg, studentId := common.CheckLogin(r); !(flg && studentId == questionBoardReply.StudentId) {
+				if loginFlg, studentId := common.CheckLogin(r); !(loginFlg && studentId == questionBoardReply.StudentId) {
 					w.WriteHeader(403)
 				} else {
 					result.Result, result.Body = questionBoardReply.AddQuestionBoardReply()

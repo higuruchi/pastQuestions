@@ -7,7 +7,7 @@ header div.search input[type="text"] {
 
     padding: 0;
     background-color: #dddfdf;
-    color: #fff;
+    /*color: #fff*/
     border: none;
     font-size: 20px;
     transition: 0.5s;
@@ -18,7 +18,7 @@ header div.search input[type="text"] {
 header div.search button {
     padding: 0;
     background-color: #72c7e6;
-    color: #fff;
+    /*color: #fff*/
     border: none;
     font-size: 20px;
     transition: 0.5s;
@@ -29,7 +29,7 @@ header div.search button {
 
 header div.search button:hover {
     background-color: #49add1;
-    color: #fff;
+    /*color: #fff*/
     transition: 0.5s;
 }
 
@@ -60,7 +60,7 @@ header div.search label {
 .loginForm form input[type="text"],  .loginForm form input[type="password"]{
     padding: 0;
     background-color: #fdfdfd;
-    color: #fff;
+    /*color: #fff*/
     border: none;
     transition: 0.5s;
     border-bottom: 1px solid black;

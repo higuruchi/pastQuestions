@@ -1,0 +1,220 @@
+body {
+  margin: 0;
+  /* display: flex; */
+  min-height: 100vh;
+  min-width: 100vw;
+}
+main {
+  width: 60%;
+  margin: 0 auto;
+  display: flex;
+}
+
+aside {
+  /* width: 20%; */
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+
+  position: absolute;
+  left: -250px;
+  height: 100%;
+  transition: all 0.2s;
+  background: #ffffff;
+}
+
+aside nav {
+  margin-top: 40px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+div.sideFooter{
+  margin-top: auto;
+  height: 300px;
+}
+
+.navIconWrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* box-shadow: 0 0 1px #333; */
+  border: none;
+  /* transition: all 0.2s; */
+  background: #ffffff;
+  border-radius: 0px 0px 10px 0px;
+}
+.navIcon {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+}
+.navIcon span{
+  content: "";
+  display: block;
+  width: 60%;
+  border-top: 3px solid #555;
+  position: absolute;
+  top: 30%;
+  left: 20%;
+  transition: .3s all;
+}
+.navIcon span:nth-child(2){
+  top: 50%;
+}
+.navIcon span:nth-child(3){
+  top: 70%;
+}
+
+.search {
+  text-align: center;
+}
+
+input[type="checkbox"]#menu {
+  position: absolute;
+  left: -50vw;
+}
+input[type="checkbox"]#login {
+  position: absolute;
+  left: -51vh;
+}
+
+input[type="checkbox"]#menu:checked ~ aside {
+  /* display: block; */
+  left: 0;
+}
+input[type="checkbox"]#login:checked ~ .loginForm {
+  top: 50px;
+}
+input[type="checkbox"]:checked ~ .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+}
+/* input[type="checkbox"]#menu:checked ~  .navIconWrap{
+  left: 250px;
+} */
+/* input[type="checkbox"]#menu:checked ~ .navIconWrap>.navIcon span:nth-child(1){
+  top: 50%;
+  transform: rotate(45deg);
+}
+input[type="checkbox"]#menu:checked ~ .navIconWrap>.navIcon span:nth-child(2){
+  opacity: 0;
+}
+input[type="checkbox"]#menu:checked ~ .navIconWrap>.navIcon span:nth-child(3){
+  top: 50%;
+  transform: rotate(-45deg);
+} */
+
+/* ------------------------------------------------------------------------- */
+
+#aside li {
+  height: 40px;
+  margin-top: auto;
+  margin-bottom: auto;
+  padding-top: 10px;
+}
+
+#aside li:hover {
+  background-color: rgb(219, 219, 219);
+}
+
+#aside i {
+  padding-left: 20px;
+  padding-right: 30px;
+}
+#aside .fas {
+  font-size: 20px;
+  color: #49add1;
+}
+
+/* ------------------------------------------------------------------------- */
+
+
+header {
+  height: 50px;
+  box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+header div.search input[type="text"] {
+
+  padding: 0;
+  background-color: #dddfdf;
+  /*color: #fff*/
+  border: none;
+  font-size: 20px;
+  transition: 0.5s;
+  border-radius: 10px 0px 0px 10px;
+  height: 30px;
+}
+
+header div.search button {
+  padding: 0;
+  background-color: #72c7e6;
+  /*color: #fff*/
+  border: none;
+  font-size: 20px;
+  transition: 0.5s;
+  border-radius: 0px 10px 10px 0px;
+  height: 30px;
+  width: 40px;
+}
+
+header div.search button i {
+  color: white;
+}
+
+header div.search button:hover {
+  background-color: #49add1;
+  /*color: #fff*/
+  transition: 0.5s;
+}
+
+header div.search label {
+  margin-left: 30px;
+}
+
+.fa-sign-in-alt {
+  font-size: 25px;
+  color: #49add1;
+}
+
+.loginForm {
+  position: absolute;
+  top: -250px;
+  right: 0px;
+  transition: all 0.2s;
+}
+.loginForm {
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fdfdfd;
+  /* border-radius: 10px 10px 10px 10px; */
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.3);
+}
+.loginForm input[type="text"],  .loginForm input[type="password"]{
+  padding: 0;
+  background-color: #fdfdfd;
+  /*color: #fff*/
+  border: none;
+  transition: 0.5s;
+  border-bottom: 1px solid black;
+  height: 30px;
+}
+.loginForm input[type="password"] {
+  padding-bottom: 0;
+}
+.loginForm button {
+  height: 30px;
+  border: none;
+  background-color: white;
+  /* border-radius: 0px 0px 10px 10px; */
+}
+/* ------------------------------------------------------------------------- */

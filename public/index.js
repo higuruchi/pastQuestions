@@ -10,6 +10,4 @@ window.onload = function() {
     document.querySelector('.questionBoard').addEventListener('click', QuestionBoard);
     document.getElementById('loginButton').addEventListener('click', Login)
     Home();
-    // home.setMainContent();
-
 }

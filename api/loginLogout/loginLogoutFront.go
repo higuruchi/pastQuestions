@@ -47,5 +47,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		result.Body = *student
 	}
 	json, _ := json.Marshal(result)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Write(json)
 }
