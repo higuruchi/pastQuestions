@@ -13,7 +13,11 @@ class App extends Component {
             searchText: "",
             homeData: {},
             questionBoardData: {},
-            studentData: {},
+            studentData: {
+                flg: false,
+                studentId: "",
+                studentName: "",
+            },
             loginForm: {
                 flg: false,
                 studentId: "",
@@ -28,6 +32,7 @@ class App extends Component {
         this.handleStudentIdChange = this.handleStudentIdChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.render = this.render.bind(this);
     }
     // sideBar----------------------------------------------------------
 
@@ -51,9 +56,9 @@ class App extends Component {
     
     // loginForm--------------------------------------------------------
     handleStudentIdChange(event) {
-        console.log(this.state.loginForm.studentId)
         this.setState({
             loginForm: {
+                flg: this.state.loginForm.flg,
                 studentId: event.target.value,
                 password: this.state.loginForm.password
             }
@@ -61,29 +66,44 @@ class App extends Component {
     }
     
     handlePasswordChange(event) {
-        console.log(this.state.loginForm.password)
         this.setState({
             loginForm: {
+                flg: this.state.loginForm.flg,
                 studentId: this.state.loginForm.studentId,
                 password: event.target.value
             }
         });
     }
-
     handleLoginClick() {
-        console.log(`stuid=${this.state.loginForm.studentId} pass=${this.state.loginForm.password}`);
         
         let studentId = this.state.loginForm.studentId;
         let password = this.state.loginForm.password;
         let httpRequest = new XMLHttpRequest();
-        httpRequest.onreadystatechange = function() {
+
+        httpRequest.onreadystatechange = function () {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let ret = JSON.parse(httpRequest.responseText);
                     console.log(ret);
+                    this.setState({
+                        loginForm: {
+                            flg: true,
+                            studentId: this.state.loginForm.studentId,
+                            password: this.state.loginForm.password
+                        },
+                        studentData: {
+                            flg: true,
+                            studentId: ret.body.studentId,
+                            studentName: ret.body.studentName
+                        }
+                    });
                 }
             }
-        }
+        }.bind(this);
+
+        // 上のbind(this) なぜできたのかが分からない
+        // bindについて勉強する必要がある
+
         httpRequest.open('POST', 'http://172.28.0.3:8080/login', true);
         httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         httpRequest.send(`studentId=${studentId}&password=${password}`);
@@ -109,29 +129,52 @@ class App extends Component {
     // --------------------------------------------------------------------
 
     render() {
-        return (
-            <div>
-                 <input id="menu" type="checkbox"/>
-                <label for="menu" class="back"></label>
-                <NavIcon/>
-                <SideBar
-                    handleHome={this.handleHome}
-                    handleQuestionBoard={this.handleQuestionBoard}
-                    handleStudent={this.handleStudent}
-                />
-                <input type="checkbox" id="login"/>
-                <LoginForm
-                    handleStudentIdChange={this.handleStudentIdChange}
-                    handlePasswordChange={this.handlePasswordChange}
-                    handleClick={this.handleLoginClick}
-                />
-                <Header
-                    handleChange={this.handleHeaderTextChange}
-                    handleClick={this.handleHeaderButtonClick}
-                />
-                
-            </div>
-        )
+        if (this.state.loginForm.flg) {
+            return (
+                <div>
+                     <input id="menu" type="checkbox"/>
+                    <label for="menu" class="back"></label>
+                    <NavIcon/>
+                    <SideBar
+                        handleHome={this.handleHome}
+                        handleQuestionBoard={this.handleQuestionBoard}
+                        handleStudent={this.handleStudent}
+                    />
+                    <input type="checkbox" id="login"/>
+                    <Header
+                        handleChange={this.handleHeaderTextChange}
+                        handleClick={this.handleHeaderButtonClick}
+                        studentData={this.state.studentData}
+                    />
+                    
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                     <input id="menu" type="checkbox"/>
+                    <label for="menu" class="back"></label>
+                    <NavIcon/>
+                    <SideBar
+                        handleHome={this.handleHome}
+                        handleQuestionBoard={this.handleQuestionBoard}
+                        handleStudent={this.handleStudent}
+                    />
+                    <input type="checkbox" id="login"/>
+                    <LoginForm
+                        handleStudentIdChange={this.handleStudentIdChange}
+                        handlePasswordChange={this.handlePasswordChange}
+                        handleClick={this.handleLoginClick}
+                    />
+                    <Header
+                        handleChange={this.handleHeaderTextChange}
+                        handleClick={this.handleHeaderButtonClick}
+                        studentData={this.state.studentData}
+                    />
+                    
+                </div>
+            )
+        }
     };
 }
 

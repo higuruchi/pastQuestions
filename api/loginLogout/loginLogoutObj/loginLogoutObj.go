@@ -9,7 +9,7 @@ import (
 
 type Student struct {
 	StudentId   string `json:"studentId"`
-	StudentName string `json:"studentName	"`
+	StudentName string `json:"studentName"`
 }
 type Result struct {
 	Result bool    `json:"result"`
