@@ -5,7 +5,7 @@ const Button = (props) => {
         <button
             onClick={props.handleClick}
         >
-            {props.value}
+            <i class="fas fa-paper-plane"></i>
         </button>
     )
 }

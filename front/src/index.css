@@ -218,3 +218,46 @@ header div.search label {
   /* border-radius: 0px 0px 10px 10px; */
 }
 /* ------------------------------------------------------------------------- */
+
+#main {
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+}
+#mainLeft {
+  min-width: 400px;
+  border: 1px solid #49add1;
+}
+#mainRight{
+  min-width: 800px;
+  display: flex;
+}
+
+.comment {
+  overflow-y: scroll;
+  width: 400px;
+}
+.comment li {
+  margin-bottom: 20px;
+}
+.repllyComment {
+  width: 400px;
+}
+.studentId {
+  font-weight: 600;
+}
+.mainComment {
+  padding-left: 20px;
+}
+
+#main input[type="text"] {
+  border: none;
+  background-color: #dddfdf;
+  border-radius: 10px 0px 0px 10px;
+}
+#main button {
+  border: none;
+  background-color: #49add1;
+  color: white;
+  border-radius: 0px 10px 10px 0px;
+}

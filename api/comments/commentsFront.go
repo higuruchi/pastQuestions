@@ -17,6 +17,7 @@ import (
 )
 
 func Comments(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	switch r.Method {
 	case "POST":
 		if flg, studentId := common.CheckLogin(r); !(flg && studentId == r.PostFormValue("studentId")) {
@@ -118,6 +119,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 
 // get /comments/reply/?classId=<classId>&commentId=<commentId>
 func CommentReplies(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	switch r.Method {
 	case "POST":
 

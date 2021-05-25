@@ -1,17 +1,6 @@
 version: "3"
 
 services:
-        pastQuestionServer:
-                image: ubuntu
-                networks: 
-                        - pastQuestionNetwork
-                depends_on: 
-                        - pastQuestionDb
-                restart: always
-                container_name: pastQuestionServer
-                volumes: 
-                        - /home/higuruchi/App/Golang/pastQuestions:/home
-                tty: true
         pastQuestionDb:
                 image: mysql
                 networks: 
@@ -23,6 +12,47 @@ services:
                 environment:
                         MYSQL_ROOT_PASSWORD: F_2324@a
                         MYSQL_DATABASE: pastQuestion
+
+        pastQuestionServer:
+                image: go-api-server
+                networks: 
+                        - pastQuestionNetwork
+                depends_on: 
+                        - pastQuestionDb
+                restart: always
+                container_name: pastQuestionServer
+                volumes: 
+                        - /home/higuruchi/App/Golang/pastQuestions:/home
+                ports:
+                        - 8080:8080
+                tty: true
+
+        pastQuestionFrontServer:
+                image: node
+                networks:
+                        - pastQuestionNetwork
+                depends_on:
+                        - pastQuestionServer
+                restart: always
+                container_name: pastQuestionFrontServer
+                volumes:
+                        - /home/higuruchi/App/Golang/pastQuestions/front:/home/
+                ports:
+                        - 3000:3000
+                tty: true
+
+        reverse-proxy:
+                image: nginx
+                # volumes:
+                #         - /home/higuruchi/App/Golang/pastQuestions/reverse-proxy/nginx.conf:/etc/nginx/nginx.conf
+                networks: 
+                        - pastQuestionNetwork
+                depends_on: 
+                        - pastQuestionFrontServer
+                restart: always
+                ports:
+                        - 80:80
+                tty: true
 
 networks:
         pastQuestionNetwork:

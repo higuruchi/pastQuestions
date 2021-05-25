@@ -34,7 +34,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	student.StudentId = studentId
 
 	if student.Login(password) {
-
+		store.Options = &sessions.Options{
+			Domain:   "localhost",
+			Path:     "/",
+			MaxAge:   2592000,
+			Secure:   false,
+			HttpOnly: true,
+		}
 		session, _ := store.Get(r, sessionName)
 		session.Values["login"] = true
 		session.Values["studentId"] = student.StudentId

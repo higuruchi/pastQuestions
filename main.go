@@ -35,7 +35,7 @@ func main() {
 	mux.HandleFunc("/questionBoardRepliesFront/", questionBoardRepliesFront.QuestionBoardReplies)
 
 	server := &http.Server{
-		Addr:    "172.28.0.3:8080",
+		Addr:    "172.25.0.3:8080",
 		Handler: mux,
 	}
 	fmt.Println("8080番ポートにて過去問データベースが稼働しています")
