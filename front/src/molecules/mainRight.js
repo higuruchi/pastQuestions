@@ -7,9 +7,6 @@ let MainRight = (props) => {
         let mainCommentData = "";
         let replyCommentData = "";
 
-
-        console.log(props.mainComment, props.replyComment)
-
         if (props.mainComments.length !== 0) {
             mainCommentData = props.mainComments.map(function(data) {
                 return (
@@ -27,7 +24,7 @@ let MainRight = (props) => {
                                 {data.comment}
                             </div>
                         </li>
-                        )
+                )
             });
         }
 
@@ -35,7 +32,7 @@ let MainRight = (props) => {
             replyCommentData = props.replyComments.map(function(data) {
                 return (
                     <li
-                        key={data.commentReplyId}
+                        // key={data.commentReplyId}
                         data-classid={data.classId}
                         data-commentid={data.commentId}
                         data-commentreplyid={data.commentReplyId}
@@ -49,14 +46,14 @@ let MainRight = (props) => {
                         </div>
                     </li>
                 )
-            })
+            });
         }
 
-        if (props.mainComment.classId !== "" && props.replyComment.commentId !== undefined) {
+        if (props.mainComment.flg === true && props.replyComment.flg === true) {
             return (
                 <div id="mainRight">
                     <div class="comment">
-                        <Text placeholder="コメントをする" handleChange={props.handleChangeMainComment}/>
+                        <Text placeholder="コメントする" handleChange={props.handleChangeMainComment}/>
                         <Button handleClick={props.handlePostMainComment}/>
                         <ul>
                             {mainCommentData}
@@ -64,18 +61,18 @@ let MainRight = (props) => {
                     </div>
                     <div class="replyComment">
                         <Text placeholder="返信する" handleChange={props.handleChangeReplyComment}/>
-                        <Button/>
+                        <Button handleClick={props.handlePostReplyComment}/>
                         <ul>
                             {replyCommentData}
                         </ul>
                     </div>
                 </div>
             )
-        } else if (props.mainComment.classId !== "" && props.replyComment.commentId === undefined) {
+        } else if (props.mainComment.flg === true && props.replyComment.flg === false) {
             return (
                 <div id="mainRight">
                     <div class="comment">
-                        <Text placeholder="コメントをする" handleChange={props.handleChangeMainComment}/>
+                        <Text placeholder="コメントする" handleChange={props.handleChangeMainComment}/>
                         <Button handleClick={props.handlePostMainComment}/>
                         <ul>
                             {mainCommentData}
@@ -83,13 +80,21 @@ let MainRight = (props) => {
                     </div>
                 </div>
             )
-        } else if (props.mainComment.classId === "" && props.replyComment.commentId === undefined) {
+        } else if (props.mainComment.flg === false && props.replyComment.flg === false) {
             return (
                 <div id="mainRight">
                 </div>
             )
         }
        
+    } else if (props.mainContentState === "questionBoard") {
+        return (
+            <div>
+                <Text placeholder="授業名" handleChange={props.handleChangeQuestionBoardClassId}/>
+                <Text placeholder="質問" handleChange={props.handleChangeQuestionBoardQuestion}/>
+                <Button handleClick={props.handlePostQuestionBoard}/>
+            </div>
+        )
     } else {
         return <div></div>
     }

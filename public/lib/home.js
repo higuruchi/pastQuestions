@@ -42,8 +42,8 @@ function setMainContent(classInfo) {
 function searchClass() {
     let searchCondition = document.querySelector("header div.search input[type=text]").value
     console.log(searchCondition)
-    let httpRequest = new XMLHttpRequest();
     let classInfo;
+    let httpRequest = new XMLHttpRequest();
     
     if (!httpRequest) {
         return false;

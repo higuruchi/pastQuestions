@@ -17,15 +17,26 @@ class App extends Component {
             mainComments: [],
             replyComments: [],
             mainComment: {
+                flg: false,
                 classId: "",
                 comment: ""
             },
             replyComment: {
+                flg: false,
                 classId: "",
                 mainCommentId: null,
                 comment: "",
             },
-            questionBoardData: {},
+            questionBoards: [],
+            questionBoard: {
+                classId: "",
+                question: ""
+            },
+            questionBoardComment: {
+                classId: "",
+                questionBoardId: "",
+                comment: ""
+            },
             studentData: {
                 flg: false,
                 studentId: "",
@@ -36,7 +47,6 @@ class App extends Component {
                 studentId: "",
                 password: "",
             },
-            hoge: "hoge"
         }
         
         this.handleHome = this.handleHome.bind(this);
@@ -57,6 +67,13 @@ class App extends Component {
         this.handleChangeReplyComment = this.handleChangeReplyComment.bind(this);
 
         this.handlePostMainComment = this.handlePostMainComment.bind(this);
+        this.handlePostReplyComment = this.handlePostReplyComment.bind(this);
+        
+        this.handleGetQuestionBoard = this. handleGetQuestionBoard.bind(this);
+        this.handleChangeQuestionBoardQuestion = this.handleChangeQuestionBoardQuestion.bind(this);
+        this.handleChangeQuestionBoardClassId = this.handleChangeQuestionBoardClassId.bind(this);
+        this.handlePostQuestionBoard = this.handlePostQuestionBoard.bind(this);
+
 
         this.handleClass = this.handleClass.bind(this);
         // this.render = this.render.bind(this);
@@ -65,14 +82,28 @@ class App extends Component {
 
     handleHome() {
         this.setState({
-            mainContentState: "home"
-        })
+            mainContentState: "home",
+            classesData: [],
+            mainComment: {
+                flg: false,
+                classId: "",
+                comment: ""
+            },
+            replyComment: {
+                flg: false,
+                classId: "",
+                mainCommentId: null,
+                comment: ""
+            }
+        });
+        this.handleClass();
     }
 
     handleQuestionBoard() {
         this.setState({
             mainContentState: "questionBoard"
-        })
+        });
+        this.handleGetQuestionBoard();
     }
 
     handleStudent() {
@@ -188,17 +219,17 @@ class App extends Component {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let commentInfo = JSON.parse(httpRequest.responseText);
-    
-                    if (commentInfo.body.length !== 0) {
+
+                    if (commentInfo.body !== null) {
                         this.setState({
                             mainComments: commentInfo.body.slice(0),
                             mainComment: {
+                                flg: true,
                                 classId: classId,
                                 comment: ""
                             }
                         });
                     }
-                    // console.log(commentInfo.body.slice(0));
                 }
             }
         }.bind(this);
@@ -212,6 +243,7 @@ class App extends Component {
     handleChangeMainComment(event) {
         this.setState({
             mainComment: {
+                flg: this.state.mainComment.flg,
                 classId: this.state.mainComment.classId,
                 comment: event.target.value
             }
@@ -226,9 +258,24 @@ class App extends Component {
                     if (httpRequest.status === 200) {
                         let comment = JSON.parse(httpRequest.responseText);
                         console.log(comment);
+                        let tmpArr = this.state.mainComments;
+                        tmpArr.unshift(comment.body[0]);
+
+                        this.setState({
+
+                            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            mainComments: tmpArr.slice(0),
+                            // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            mainComment: {
+                                flg: this.state.mainComment.flg,
+                                classId: this.state.mainComment.classId,
+                                // mainCommentId: this.state.mainComment.mainCommentId,
+                                comment: ""
+                            }
+                        });
                     }
                 }
-            }
+            }.bind(this);
             httpRequest.open('POST', 'http://localhost/comments/main/', true);
             httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             httpRequest.send(`classId=${this.state.mainComment.classId}&studentId=${this.state.studentData.studentId}&comment=${this.state.mainComment.comment}`);
@@ -241,21 +288,35 @@ class App extends Component {
         let httpRequest = new XMLHttpRequest();
         let classId = event.currentTarget.dataset.classid;
         let commentId = event.currentTarget.dataset.commentid;
+
+
+        console.log(classId, commentId);
+
         httpRequest.onreadystatechange = function() {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
                 if (httpRequest.status === 200) {
                     let replyComments = JSON.parse(httpRequest.responseText);
-                    
+    
                     if (replyComments.body.length !== 0) {
                         this.setState({
                             replyComments: replyComments.body.slice(0),
                             replyComment: {
+                                flg: true,
                                 classId: classId,
-                                commentId: commentId,
+                                mainCommentId: commentId,
                                 comment: ""
                             }
-                        })
-                    }
+                        });
+                    } 
+                    // else {
+                    //     this.setState({
+                    //         replyComment: {
+                    //             classId: classId,
+                    //             mainCommentId: commentId,
+                    //             comment: ""
+                    //         }
+                    //     })
+                    // }
                 }
             }
         }.bind(this);
@@ -266,18 +327,139 @@ class App extends Component {
     handleChangeReplyComment(event) {
         this.setState({
             replyComment: {
+                flg: this.state.replyComment.flg,
                 classId: this.state.replyComment.classId,
-                commentId: this.state.replyComment.commentId,
+                mainCommentId: this.state.replyComment.mainCommentId,
                 comment: event.target.value
             }
         })
     }
 
     handlePostReplyComment(event) {
+        let httpRequest = new XMLHttpRequest();
 
+        if (this.state.loginForm.flg) {
+            httpRequest.onreadystatechange = function() {
+                if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                    if (httpRequest.status === 200) {
+                        let comment = JSON.parse(httpRequest.responseText);
+                        let tmpArr = this.state.replyComments;
+                        tmpArr.unshift(comment.body[0]);
+
+                        this.setState({
+                            replyComments: tmpArr.slice(0),
+                            replyComment: {
+                                flg: this.state.replyComment.flg,
+                                classId: this.state.replyComment.classId,
+                                mainCommentId: this.state.replyComment.mainCommentId,
+                                comment: ""
+                            }
+                        });
+                    }
+                }
+            }.bind(this)
+            httpRequest.open('POST', 'http://localhost/comments/reply/', true);
+            httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            httpRequest.send(`classId=${this.state.replyComment.classId}&studentId=${this.state.studentData.studentId}&comment=${this.state.replyComment.comment}&commentId=${this.state.replyComment.mainCommentId}`);
+        } else {
+            alert("ログインをしてください");
+        }
     }
-    // -----------------------------------------------------------------------    
+    // questionBoard------------------------------------------------------------------    
 
+    handleGetQuestionBoard() {
+        let httpRequest = new XMLHttpRequest();
+        httpRequest.onreadystatechange = function() {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    let questionBoardInfo = JSON.parse(httpRequest.responseText);
+                    console.log(questionBoardInfo);
+
+                    this.setState({
+                        questionBoards: questionBoardInfo.body.slice(0)
+                    })
+                }
+            }
+        }.bind(this)
+        httpRequest.open('GET', 'http://localhost/questionBoards/', true);
+        httpRequest.send();
+    }
+
+    handleChangeQuestionBoardQuestion(event) {
+        let question = event.target.value;
+
+        console.log(question);
+
+        this.setState({
+            questionBoard: {
+                classId: this.state.questionBoard.classId,
+                question: question
+            }
+        });
+    }
+
+    handleChangeQuestionBoardClassId(event) {
+        let httpRequest = new XMLHttpRequest();
+        let searchCondition = event.target.value;
+        console.log(searchCondition);
+    
+        if (!httpRequest) {
+            return false;
+        }
+        httpRequest.onreadystatechange = function () {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    let classInfo = JSON.parse(httpRequest.responseText);
+                    if (classInfo.body !== null) {
+
+                        this.setState({
+                            questionBoard: {
+                                classId: classInfo.body[0].classId,
+                                question: this.state.questionBoard.question
+                            }
+                        });
+                    } 
+                }
+            }
+        }.bind(this);
+
+        httpRequest.open('GET', 'http://localhost/classes/?className='+searchCondition, true);
+        httpRequest.send();
+    }
+
+    handlePostQuestionBoard() {
+        let classId = this.state.questionBoard.classId;
+        let question = this.state.questionBoard.question;
+        let studentId = this.state.studentData.studentId;
+
+        if (this.state.studentData.flg) {
+            if (question !== "" && classId !== "") {
+                let httpRequest = new XMLHttpRequest();
+                httpRequest.onreadystatechange = function() {
+                    if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                        if (httpRequest.status === 200) {
+                            let questionBoardInfo = JSON.parse(httpRequest.responseText);
+                            // questionBoardInfo.body.pop();
+                            console.log(questionBoardInfo);
+                        }
+                    }
+                }
+                httpRequest.open('POST', `http://localhost/questionBoards/${classId}/2020/${studentId}/`, true);
+                httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                httpRequest.send('question='+question);
+            } else {
+                alert(`classid=${classId}`);
+            }
+        } else {
+            alert("ログインをしてください");
+        }
+    }
+
+    // handlePostQuestionBoardReply() {
+
+    // }
+    // -----------------------------------------------------------------------    
+ 
     // -----------------------------------------------------------------------    
     // -----------------------------------------------------------------------    
     // -----------------------------------------------------------------------
@@ -306,18 +488,28 @@ class App extends Component {
                         handleClick={this.handleHeaderButtonClick}
                         studentData={this.state.studentData}
                     />
+
                     <MainContent 
-                       mainContentState={this.state.mainContentState}
-                       classesData={this.state.classesData}
-                       handleGetMainComment={this.handleGetMainComment}
-                       handleGetReplyComment={this.handleGetReplyComment}
-                       handleChangeMainComment={this.handleChangeMainComment}
-                       handleChangeReplyComment={this.handleChangeReplyComment}
-                       handlePostMainComment={this.handlePostMainComment}
-                       mainComments={this.state.mainComments}
-                       replyComments={this.state.replyComments}
-                       mainComment={this.state.mainComment}
-                       replyComment={this.state.replyComment}
+                        handleGetMainComment={this.handleGetMainComment}
+                        handleGetReplyComment={this.handleGetReplyComment}
+                        
+                        handleChangeMainComment={this.handleChangeMainComment}
+                        handleChangeReplyComment={this.handleChangeReplyComment}
+                        
+                        handlePostMainComment={this.handlePostMainComment}
+                        handlePostReplyComment={this.handlePostReplyComment}
+
+                        handleChangeQuestionBoardQuestion={this.handleChangeQuestionBoardQuestion}
+                        handleChangeQuestionBoardClassId={this.handleChangeQuestionBoardClassId}
+                        handlePostQuestionBoard={this.handlePostQuestionBoard}
+                        
+                        mainContentState={this.state.mainContentState}
+                        classesData={this.state.classesData}
+                        mainComments={this.state.mainComments}
+                        replyComments={this.state.replyComments}
+                        questionBoards={this.state.questionBoards}
+                        mainComment={this.state.mainComment}
+                        replyComment={this.state.replyComment}
                     />
                 </div>
             )
@@ -344,15 +536,26 @@ class App extends Component {
                         studentData={this.state.studentData}
                     />
                     <MainContent 
-                        mainContentState={this.state.mainContentState}
-                        classesData={this.state.classesData}
                         handleGetMainComment={this.handleGetMainComment}
                         handleGetReplyComment={this.handleGetReplyComment}
+                        
                         handleChangeMainComment={this.handleChangeMainComment}
                         handleChangeReplyComment={this.handleChangeReplyComment}
+                        
                         handlePostMainComment={this.handlePostMainComment}
+                        handlePostReplyComment={this.handlePostReplyComment}
+
+                        handleChangeQuestionBoardQuestion={this.handleChangeQuestionBoardQuestion}
+                        handleChangeQuestionBoardClassId={this.handleChangeQuestionBoardClassId}
+                        handlePostQuestionBoard={this.handlePostQuestionBoard}
+                        
+                        mainContentState={this.state.mainContentState}
+                        classesData={this.state.classesData}
+                        
                         mainComments={this.state.mainComments}
                         replyComments={this.state.replyComments}
+                        
+                        questionBoards={this.state.questionBoards}
                         mainComment={this.state.mainComment}
                         replyComment={this.state.replyComment}
                     />

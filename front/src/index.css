@@ -226,18 +226,26 @@ header div.search label {
 }
 #mainLeft {
   min-width: 400px;
-  border: 1px solid #49add1;
 }
 #mainRight{
   min-width: 800px;
   display: flex;
 }
+#mainLeft ul.classes li {
+  font-size: large;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #49add1;
+}
+#mainLeft ul.classes li i {
+  margin-right: 20px;
+  color:#49add1;
+}
 
 .comment {
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   width: 400px;
 }
-.comment li {
+.comment li, .replyComment li {
   margin-bottom: 20px;
 }
 .repllyComment {
@@ -246,12 +254,13 @@ header div.search label {
 .studentId {
   font-weight: 600;
 }
-.mainComment {
+.mainComment, .replyComment{
   padding-left: 20px;
 }
 
 #main input[type="text"] {
   border: none;
+  /* height: 20px; */
   background-color: #dddfdf;
   border-radius: 10px 0px 0px 10px;
 }
@@ -261,3 +270,37 @@ header div.search label {
   color: white;
   border-radius: 0px 10px 10px 0px;
 }
+
+#mainLeft .questionBoard summary {
+  cursor: pointer;
+}
+#mainLeft .questionBoard details {
+  min-height: 10px;
+  margin-bottom: 20px;
+  transition: 0.5s;
+}
+#mainLeft .questionBoard details[open] {
+  background: #c3f6ff;
+}
+#mainLeft .questionBoard details ul {
+  margin-left: 20px;
+}
+#mainLeft .questionBoard .className {
+  font-size: small;
+  color: rgb(54, 54, 54);
+}
+/* #mainLeft .questionBoard .question {
+  
+} */
+/* ul.questionBoardReply {
+  display: none;
+}
+#questionBoardReplyDisp {
+  display: none;
+}
+#questionBoardReplyDisp:checked ~ ul.questionBoardReply {
+  display:inline;
+}
+#questionBoardReplyDisp:checked ~ label.questionBoardReply {
+  display: none;
+} */
