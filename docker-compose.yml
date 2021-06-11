@@ -3,8 +3,6 @@ version: "3"
 services:
         pastQuestionDb:
                 image: mysql
-                networks: 
-                        - pastQuestionNetwork
                 volumes:
                         - pastQuestionVolume:/var/lib/mysql
                 restart: always
@@ -12,11 +10,13 @@ services:
                 environment:
                         MYSQL_ROOT_PASSWORD: F_2324@a
                         MYSQL_DATABASE: pastQuestion
+                networks: 
+                        pastQuestionNetwork:
+                                ipv4_address: 172.29.0.2
+
 
         pastQuestionServer:
                 image: go-api-server
-                networks: 
-                        - pastQuestionNetwork
                 depends_on: 
                         - pastQuestionDb
                 restart: always
@@ -26,11 +26,12 @@ services:
                 ports:
                         - 8080:8080
                 tty: true
+                networks:
+                        pastQuestionNetwork:
+                                ipv4_address: 172.29.0.3
 
         pastQuestionFrontServer:
                 image: node
-                networks:
-                        - pastQuestionNetwork
                 depends_on:
                         - pastQuestionServer
                 restart: always
@@ -40,13 +41,16 @@ services:
                 ports:
                         - 3000:3000
                 tty: true
+                networks:
+                        pastQuestionNetwork:
+                                ipv4_address: 172.29.0.4
+
 
         reverse-proxy:
-                image: nginx
-                # volumes:
-                #         - /home/higuruchi/App/Golang/pastQuestions/reverse-proxy/nginx.conf:/etc/nginx/nginx.conf
+                image: nginx-pastquestion
                 networks: 
-                        - pastQuestionNetwork
+                        pastQuestionNetwork:
+                                ipv4_address: 172.29.0.5
                 depends_on: 
                         - pastQuestionFrontServer
                 restart: always
@@ -56,5 +60,11 @@ services:
 
 networks:
         pastQuestionNetwork:
+                name: pastQuestionNetwork
+                driver: bridge
+                ipam:
+                        driver: default
+                        config:
+                                - subnet: 172.29.0.0/24
 volumes: 
         pastQuestionVolume:
