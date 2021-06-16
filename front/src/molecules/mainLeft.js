@@ -29,7 +29,7 @@ let MainLeft = (props) => {
         questionBoard = props.questionBoards.map(function(data) {
             let questionBoardReply = "";
 
-            if (data.questionBoardReply !== null) {
+            if (data.questionBoardReply !== null && data.questionBoardReply !== undefined) {
                 questionBoardReply = data.questionBoardReply.map(function(rep) {
                     return (
                         <li key={rep.questionBoardReplyId}>

@@ -297,7 +297,7 @@ class App extends Component {
                 if (httpRequest.status === 200) {
                     let replyComments = JSON.parse(httpRequest.responseText);
     
-                    if (replyComments.body.length !== 0) {
+                    if (replyComments.body !== null && replyComments.body.length !== 0) {
                         this.setState({
                             replyComments: replyComments.body.slice(0),
                             replyComment: {
@@ -308,15 +308,17 @@ class App extends Component {
                             }
                         });
                     } 
-                    // else {
-                    //     this.setState({
-                    //         replyComment: {
-                    //             classId: classId,
-                    //             mainCommentId: commentId,
-                    //             comment: ""
-                    //         }
-                    //     })
-                    // }
+                    else {
+                        this.setState({
+                            replyComments: [],
+                            replyComment: {
+                                flg: true,
+                                classId: classId,
+                                mainCommentId: commentId,
+                                comment: ""
+                            }
+                        })
+                    }
                 }
             }
         }.bind(this);
@@ -440,10 +442,15 @@ class App extends Component {
                         if (httpRequest.status === 200) {
                             let questionBoardInfo = JSON.parse(httpRequest.responseText);
                             // questionBoardInfo.body.pop();
-                            console.log(questionBoardInfo);
+                            let newQuestionBoardInfo = this.state.questionBoards.slice(0);
+                            console.log(newQuestionBoardInfo);
+                            newQuestionBoardInfo.push(questionBoardInfo.body[0]);
+                            this.setState({
+                                questionBoards: newQuestionBoardInfo.slice(0)
+                            });
                         }
                     }
-                }
+                }.bind(this);
                 httpRequest.open('POST', `http://localhost/questionBoards/${classId}/2020/${studentId}/`, true);
                 httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 httpRequest.send('question='+question);
